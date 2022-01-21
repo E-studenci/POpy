@@ -17,6 +17,7 @@ setup(
         'Jinja2==3.0.3',
         'jsonschema==4.4.0',
         'MarkupSafe==2.0.1',
+        'psycopg2==2.9.3',
         'pyrsistent==0.18.1',
         'SQLAlchemy==1.4.31',
         'Werkzeug==2.0.2',

@@ -1,1 +1,1 @@
-import po_api.database.db as db
+from po_api import DATABASE

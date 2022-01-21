@@ -1,7 +1,7 @@
 
 from dataclasses import dataclass, field
 
-from po_api.database.models.model import Model
+from po_api.database.orm.model import Model
 
 
 @dataclass

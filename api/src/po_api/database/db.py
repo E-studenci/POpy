@@ -2,14 +2,15 @@ from sqlalchemy.exc import SQLAlchemyError
 from functools import wraps
 import typing as t
 import sqlalchemy
-
-from po_api.utils.errors import DBConnectionError
 import logging
 
+from po_api.utils.errors import DBConnectionError
+from po_api.utils.config import Environment
 
 class Database:
-    def __init__(self, db_url: str) -> None:
-        self.engine = sqlalchemy.create_engine(db_url)
+    def __init__(self, env: Environment) -> None:
+        url = f'{env.db_protocol}://{env.db_user}:{env.db_pass}@{env.db_host}:{env.db_port}/{env.db_name}'
+        self.engine = sqlalchemy.create_engine(url)
     
     def db_query(self, func) -> t.Callable:
         @wraps(func)
