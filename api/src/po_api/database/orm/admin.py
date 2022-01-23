@@ -10,7 +10,7 @@ class Admin(Model):
     login: str = field(init=True, default=None)
     password: str = field(init=True, default=None)
 
-    @property
+    @property ## TODO: add to user
     def is_active(self):
         return True
 

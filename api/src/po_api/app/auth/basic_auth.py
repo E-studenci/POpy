@@ -8,7 +8,7 @@ from po_api import BASIC_AUTH
 @BASIC_AUTH.verify_password
 def verify_password(username, password):
     try:
-        user = read.get_admin_by_login(username)
+        user = read.get_admin_by_login(username) ## TODO: chuj 
     except DBConnectionError:
         abort(500)
     if user and user.password == password:

@@ -1,7 +1,10 @@
+from dataclasses import dataclass
+from datetime import datetime
 import enum
+import json
 import sqlalchemy as db
 from sqlalchemy.orm import declarative_base, relationship
-
+from sqlalchemy.ext.declarative import DeclarativeMeta
 
 TABLE_LICENCES = "license"
 TABLE_USERS = "user"
@@ -57,65 +60,121 @@ trip_guides = db.Table('association', Base.metadata,
     db.Column('guide', db.ForeignKey(TABLE_USERS + '.id'), primary_key=True),
     db.Column('trip', db.ForeignKey(TABLE_TRIPS + '.id'), primary_key=True)
 )
+
+@dataclass
 class User(Base):
+    id:int
+    login: str
+    password: str
+    name: str
+    surname: str
+
+    roles: list['UserRole']
+    badge_acquirement_reviews: list['BadgeAcquirementReview']
+    got_book: list['GotBook']
+    participation_reviews: list['ParticipationReview']
+    organized_trips: list['Trip']
+    guided_trips: list['Trip']
+    trip_plans: list['TripPlan']
+
+
     __tablename__ = TABLE_USERS
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    login = db.Column(db.String(30))
+    login = db.Column(db.String(30), unique=True)
     password = db.Column(db.String(255))
     name = db.Column(db.String(30))
     surname = db.Column(db.String(30))
     
-    roles = relationship(tablename_to_class_name(TABLE_USER_ROLES), back_populates="user")
-    badge_acquirement_reviews = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENT_REVIEWS), back_populates="reviewer")
-    got_book = relationship(tablename_to_class_name(TABLE_GOT_BOOKS), uselist=False, back_populates="owner")
-    participation_reviews = relationship(tablename_to_class_name(TABLE_PARTICIPATION_REVIEWS), back_populates="reviewer")
-    organized_trips = relationship(tablename_to_class_name(TABLE_TRIPS), back_populates="organizer")
-    guided_trips = relationship(tablename_to_class_name(TABLE_TRIPS), secondary=trip_guides, back_populates="guides")
-    trip_plans = relationship(tablename_to_class_name(TABLE_TRIP_PLANS), back_populates="creator")  
+    roles = relationship(tablename_to_class_name(TABLE_USER_ROLES), lazy='noload', back_populates="user")
+    badge_acquirement_reviews = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENT_REVIEWS), lazy='noload', back_populates="reviewer")
+    got_book = relationship(tablename_to_class_name(TABLE_GOT_BOOKS), uselist=False, lazy='noload', back_populates="owner")
+    participation_reviews = relationship(tablename_to_class_name(TABLE_PARTICIPATION_REVIEWS), lazy='noload', back_populates="reviewer")
+    organized_trips = relationship(tablename_to_class_name(TABLE_TRIPS), lazy='noload', back_populates="organizer")
+    guided_trips = relationship(tablename_to_class_name(TABLE_TRIPS), secondary=trip_guides, lazy='noload', back_populates="guides")
+    trip_plans = relationship(tablename_to_class_name(TABLE_TRIP_PLANS), lazy='noload', back_populates="creator")  
 
+@dataclass
 class Role(Base):
+    id:int
+    name:str
+    users: list['UserRole']
+
     __tablename__ = TABLE_ROLES
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(30))
-    users = relationship(tablename_to_class_name(TABLE_USER_ROLES), back_populates="roles")
+    users = relationship(tablename_to_class_name(TABLE_USER_ROLES), lazy='noload', back_populates="role")
 
+@dataclass
 class UserRole(Base):
+    user: 'User'
+    role: 'Role'
+    args: dict
+
     __tablename__ = TABLE_USER_ROLES
 
     user_id = db.Column(db.Integer, db.ForeignKey(TABLE_USERS + ".id"), primary_key=True)
-    user = relationship(tablename_to_class_name(TABLE_USERS), back_populates="roles")
+    user = relationship(tablename_to_class_name(TABLE_USERS), lazy='noload', back_populates="roles")
 
     role_id = db.Column(db.Integer, db.ForeignKey(TABLE_ROLES + ".id"), primary_key=True)
-    roles = relationship(tablename_to_class_name(TABLE_ROLES), back_populates="users")
+    role = relationship(tablename_to_class_name(TABLE_ROLES), lazy='noload', back_populates="users")
 
     args = db.Column(db.PickleType)
 
+
+@dataclass
 class MountainRange(Base):
+    id:int
+    name:str
+    waypoints:list['Waypoint']
+
+
     __tablename__ = TABLE_MOUNTAIN_RANGES
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(30))
-    waypoints = relationship(tablename_to_class_name(TABLE_WAYPOINTS), back_populates="mountain_range")
+    waypoints = relationship(tablename_to_class_name(TABLE_WAYPOINTS), lazy='noload', back_populates="mountain_range")
 
+@dataclass
 class Waypoint(Base):
+    id:int
+    name:str
+    elevation:int
+    longtitude:str
+    latitude:str
+    description:str
+    mountain_range:'MountainRange'
+    path_starts: list['Path']
+
     __tablename__ = TABLE_WAYPOINTS
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(30))
     elevation = db.Column(db.Integer)
-    longtitude = db.Column(db.String)
+    longtitude = db.Column(db.String)#TODO
     latitude = db.Column(db.String)
     description = db.Column(db.String(255))
 
     mountain_range_id = db.Column(db.Integer, db.ForeignKey(TABLE_MOUNTAIN_RANGES + ".id"))
-    mountain_range = relationship(tablename_to_class_name(TABLE_MOUNTAIN_RANGES), back_populates="waypoints")
+    mountain_range = relationship(tablename_to_class_name(TABLE_MOUNTAIN_RANGES), lazy='noload', back_populates="waypoints")
 
-    path_starts = relationship(tablename_to_class_name(TABLE_PATHS), back_populates="waypoint_a", foreign_keys='Path.waypoint_a_id')
-    path_ends = relationship(tablename_to_class_name(TABLE_PATHS), back_populates="waypoint_b", foreign_keys='Path.waypoint_b_id')
+    path_starts = relationship(tablename_to_class_name(TABLE_PATHS), lazy='noload', back_populates="waypoint_a", foreign_keys='[Path.waypoint_a_id]')
+    # path_starts = relationship(tablename_to_class_name(TABLE_PATHS), lazy='noload', back_populates="waypoint_a", foreign_keys='[Path.waypoint_a_id]')
 
+    # path_ends = relationship(tablename_to_class_name(TABLE_PATHS), lazy='noload', back_populates="waypoint_b", foreign_keys='[Path.waypoint_b_id]')
+
+@dataclass
 class Path(Base):
+    id: int
+    color: ColorsEnum
+    is_official: bool
+    points: int
+    status: PathStatus
+    waypoint_a: 'Waypoint'
+    waypoint_b: 'Waypoint'
+    segments: list['TripSegment']
+
     __tablename__ = TABLE_PATHS
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -125,13 +184,24 @@ class Path(Base):
     status = db.Column(db.Enum(PathStatus))
 
     waypoint_a_id = db.Column(db.Integer, db.ForeignKey(TABLE_WAYPOINTS + ".id"))
-    waypoint_a = relationship(tablename_to_class_name(TABLE_WAYPOINTS), back_populates="path_starts", foreign_keys='Path.waypoint_a_id')
+    waypoint_a = relationship(tablename_to_class_name(TABLE_WAYPOINTS), lazy='noload', back_populates="path_starts", foreign_keys='Path.waypoint_a_id')
     waypoint_b_id = db.Column(db.Integer, db.ForeignKey(TABLE_WAYPOINTS + ".id"))
-    waypoint_b = relationship(tablename_to_class_name(TABLE_WAYPOINTS), back_populates="path_ends", foreign_keys='Path.waypoint_b_id')
+    waypoint_b = relationship(tablename_to_class_name(TABLE_WAYPOINTS), foreign_keys='Path.waypoint_b_id')
 
-    segments = relationship(tablename_to_class_name(TABLE_TRIP_SEGMENTS), back_populates="path")
+    segments = relationship(tablename_to_class_name(TABLE_TRIP_SEGMENTS), lazy='noload', back_populates="path")
 
+@dataclass
 class TripPlan(Base):
+    id: int
+    name: str
+    description: str
+    distance: float
+    difficulty: TripDifficulty
+    is_public: bool
+    creator: 'User'
+    segments: list['TripSegment']
+    trips: list['Trip']
+
     __tablename__ = TABLE_TRIP_PLANS
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -142,61 +212,96 @@ class TripPlan(Base):
     is_public = db.Column(db.Boolean)
     
     creator_id = db.Column(db.Integer, db.ForeignKey(TABLE_USERS + ".id"))
-    creator = relationship(tablename_to_class_name(TABLE_USERS), back_populates="trip_plans")
+    creator = relationship(tablename_to_class_name(TABLE_USERS), lazy='noload', back_populates="trip_plans")
     
-    segments = relationship(tablename_to_class_name(TABLE_TRIP_SEGMENTS), back_populates="trip_plan")
-    trips = relationship(tablename_to_class_name(TABLE_TRIPS), back_populates="trip_plan")
+    segments = relationship(tablename_to_class_name(TABLE_TRIP_SEGMENTS), lazy='noload', back_populates="trip_plan")
+    trips = relationship(tablename_to_class_name(TABLE_TRIPS), lazy='noload', back_populates="trip_plan")
 
+@dataclass
 class TripSegment(Base):
+    index: int
+    trip_plan: 'TripPlan'
+    path: 'Path'
+
     __tablename__ = TABLE_TRIP_SEGMENTS
 
     index = db.Column(db.Integer, primary_key=True)
 
     trip_plan_id = db.Column(db.Integer, db.ForeignKey(TABLE_TRIP_PLANS + ".id"), primary_key=True)
-    trip_plan = relationship(tablename_to_class_name(TABLE_TRIP_PLANS), back_populates="segments")
+    trip_plan = relationship(tablename_to_class_name(TABLE_TRIP_PLANS), lazy='noload', back_populates="segments")
 
     path_id = db.Column(db.Integer, db.ForeignKey(TABLE_PATHS + ".id"), primary_key=True)
-    path = relationship(tablename_to_class_name(TABLE_PATHS), back_populates="segments")
+    path = relationship(tablename_to_class_name(TABLE_PATHS), lazy='noload', back_populates="segments")
 
+@dataclass
 class Badge(Base):
+    id: int
+    required_age: int
+    required_points: int
+    acquirements: list['BadgeAcquirement']
+
     __tablename__ = TABLE_BADGES
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     required_age = db.Column(db.Integer)
     required_points = db.Column(db.Integer)
-    acquirements = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENTS), back_populates="badge")
+    acquirements = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENTS), lazy='noload', back_populates="badge")
 
+@dataclass
 class BadgeAcquirement(Base):
+    id: int
+    status: BadgeAcquirementStatusEnum
+    badge: 'Badge'
+    got_book: 'GotBook'
+    participations: list['Participation']
+    reviews: list['BadgeAcquirementReview']
+
     __tablename__ = TABLE_BADGE_ACQUIREMENTS
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     status = db.Column(db.Enum(BadgeAcquirementStatusEnum))
 
     badge_id = db.Column(db.Integer, db.ForeignKey(TABLE_BADGES + ".id"))
-    badge = relationship(tablename_to_class_name(TABLE_BADGES), back_populates="acquirements")
+    badge = relationship(tablename_to_class_name(TABLE_BADGES), lazy='noload', back_populates="acquirements")
 
     got_book_id = db.Column(db.Integer, db.ForeignKey(TABLE_GOT_BOOKS + ".id"))
-    got_book = relationship(tablename_to_class_name(TABLE_GOT_BOOKS), back_populates="badge_acquirements")
+    got_book = relationship(tablename_to_class_name(TABLE_GOT_BOOKS), lazy='noload', back_populates="badge_acquirements")
 
-    participations = relationship(tablename_to_class_name(TABLE_PARTICIPATIONS), back_populates="badge_acquirement")
+    participations = relationship(tablename_to_class_name(TABLE_PARTICIPATIONS), lazy='noload', back_populates="badge_acquirement")
 
-    reviews = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENT_REVIEWS), back_populates="badge_acquirement") 
+    reviews = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENT_REVIEWS), lazy='noload', back_populates="badge_acquirement") 
 
+@dataclass
 class BadgeAcquirementReview(Base):
+    badge_acquirement: 'BadgeAcquirement'
+    reviewer: 'User'
+    review_date: datetime
+    required_points: int
+    earned_points: int
+    review: ReviewEnum
+
     __tablename__ = TABLE_BADGE_ACQUIREMENT_REVIEWS
 
     badge_acquirement_id = db.Column(db.Integer, db.ForeignKey(TABLE_BADGE_ACQUIREMENTS + ".id"), primary_key=True)
-    badge_acquirement = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENTS), back_populates="reviews")
+    badge_acquirement = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENTS), lazy='noload', back_populates="reviews")
 
     reviewer_id = db.Column(db.Integer, db.ForeignKey(TABLE_USERS + ".id"), primary_key=True)
-    reviewer = relationship(tablename_to_class_name(TABLE_USERS), back_populates="badge_acquirement_reviews")
+    reviewer = relationship(tablename_to_class_name(TABLE_USERS), lazy='noload', back_populates="badge_acquirement_reviews")
     
     review_date = db.Column(db.DateTime)
     required_points = db.Column(db.Integer)
     earned_points = db.Column(db.Integer)
     review = db.Column(db.Enum(ReviewEnum))
 
+@dataclass
 class Participation(Base):
+    id: int
+    # images: TODO
+    status: ParticipationStatusEnum
+    trip: 'Trip'
+    badge_acquirement: 'BadgeAcquirement'
+    participation_reviews: list['ParticipationReview']
+
     __tablename__ = TABLE_PARTICIPATIONS
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -204,40 +309,65 @@ class Participation(Base):
     status = db.Column(db.Enum(ParticipationStatusEnum))
 
     trip_id = db.Column(db.Integer, db.ForeignKey(TABLE_TRIPS + ".id"))
-    trip = relationship(tablename_to_class_name(TABLE_TRIPS), back_populates="participations")
+    trip = relationship(tablename_to_class_name(TABLE_TRIPS), lazy='noload', back_populates="participations")
 
     badge_acquirement_id = db.Column(db.Integer, db.ForeignKey(TABLE_BADGE_ACQUIREMENTS + ".id"))
-    badge_acquirement = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENTS), back_populates="participations")
+    badge_acquirement = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENTS), lazy='noload', back_populates="participations")
 
-    participation_reviews = relationship(tablename_to_class_name(TABLE_PARTICIPATION_REVIEWS), back_populates="participation")
+    participation_reviews = relationship(tablename_to_class_name(TABLE_PARTICIPATION_REVIEWS), lazy='noload', back_populates="participation")
 
+@dataclass
 class GotBook(Base):
+    id: int
+    issue_date: datetime
+    badge_acquirements: list['BadgeAcquirement']
+    owner: 'User'
+
     __tablename__ = TABLE_GOT_BOOKS
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     issue_date = db.Column(db.DateTime)
 
-    badge_acquirements = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENTS), back_populates="got_book")
+    badge_acquirements = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENTS), lazy='noload', back_populates="got_book")
 
     owner_id = db.Column(db.Integer, db.ForeignKey(TABLE_USERS + ".id"))
-    owner = relationship(tablename_to_class_name(TABLE_USERS), back_populates="got_book")
+    owner = relationship(tablename_to_class_name(TABLE_USERS), lazy='noload', back_populates="got_book")
 
+@dataclass
 class ParticipationReview(Base):
+    id: int
+    review: ReviewEnum
+    participation: 'Participation'
+    reviewer: 'User'
+    review_date: datetime
+    earned_points: int
+
     __tablename__ = TABLE_PARTICIPATION_REVIEWS
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     review = db.Column(db.Enum(ReviewEnum))
 
     participation_id = db.Column(db.Integer, db.ForeignKey(TABLE_PARTICIPATIONS  + ".id"))
-    participation = relationship(tablename_to_class_name(TABLE_PARTICIPATIONS), back_populates="participation_reviews")
+    participation = relationship(tablename_to_class_name(TABLE_PARTICIPATIONS), lazy='noload', back_populates="participation_reviews")
 
     reviewer_id = db.Column(db.Integer, db.ForeignKey(TABLE_USERS  + ".id"))
-    reviewer = relationship(tablename_to_class_name(TABLE_USERS), back_populates="participation_reviews")
+    reviewer = relationship(tablename_to_class_name(TABLE_USERS), lazy='noload', back_populates="participation_reviews")
 
     review_date = db.Column(db.DateTime)
     earned_points = db.Column(db.Integer)
 
+@dataclass
 class Trip(Base):
+    id: int
+    date: datetime
+    name: str
+    description: str
+    is_public: bool
+    participations: list['Participation']
+    organizer: 'User'
+    guides: list['User']
+    trip_plan: 'TripPlan'
+
     __tablename__ = TABLE_TRIPS
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -247,18 +377,51 @@ class Trip(Base):
     description = db.Column(db.String(255))
     is_public = db.Column(db.Boolean)
 
-    participations = relationship(tablename_to_class_name(TABLE_PARTICIPATIONS), back_populates="trip")
+    participations = relationship(tablename_to_class_name(TABLE_PARTICIPATIONS), lazy='noload', back_populates="trip")
 
     organizer_id = db.Column(db.Integer, db.ForeignKey(TABLE_USERS + ".id"))
-    organizer = relationship(tablename_to_class_name(TABLE_USERS), back_populates="organized_trips")
+    organizer = relationship(tablename_to_class_name(TABLE_USERS), lazy='noload', back_populates="organized_trips")
 
-    guides = relationship(tablename_to_class_name(TABLE_USERS), secondary=trip_guides, back_populates="guided_trips")
+    guides = relationship(tablename_to_class_name(TABLE_USERS), secondary=trip_guides, lazy='noload', back_populates="guided_trips")
 
     trip_plan_id = db.Column(db.Integer, db.ForeignKey(TABLE_TRIP_PLANS  + ".id"))
-    trip_plan = relationship(tablename_to_class_name(TABLE_TRIP_PLANS), back_populates="trips")
+    trip_plan = relationship(tablename_to_class_name(TABLE_TRIP_PLANS), lazy='noload', back_populates="trips")
 
 if __name__ == "__main__":
-    url = f'postgresql+psycopg2://postgres:AB9B75D8E128E8040A0E0D751D37393CA8D4C663@130.61.111.97:30001'
+    url = f'postgresql+psycopg2://postgres:AB9B75D8E128E8040A0E0D751D37393CA8D4C663@130.61.111.97:30001/test'
     engine = db.create_engine(url, echo=True)
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
+
+
+
+def new_alchemy_encoder():
+    _visited_objs = []
+
+    class AlchemyEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj.__class__, DeclarativeMeta):
+                # don't re-visit self
+                if obj in _visited_objs:
+                    return None
+                _visited_objs.append(obj)
+
+                # an SQLAlchemy class
+                fields = {}
+                for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+                    try:
+                        attr = obj.__getattribute__(field)
+                        if isinstance(attr, db.orm.decl_api.registry):
+                            pass
+                        elif isinstance(attr, enum.Enum):
+                            fields[field] = attr.name
+                        else:
+                            fields[field] = attr
+                    except:
+                        fields[field] = ""
+                # a json-encodable dict
+                return fields
+
+            return json.JSONEncoder.default(self, obj)
+
+    return AlchemyEncoder

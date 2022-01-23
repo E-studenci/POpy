@@ -1,8 +1,11 @@
+import json
 import unittest
 
 import po_api.utils.json_validation.json_methods as json_methods
 import po_api.database.queries.read as read
-
+import po_api.database.queries.create as create
+from po_api.database.orm.models import new_alchemy_encoder
+from flask import jsonify, Flask
 SCHEMA =  {
     "type" : "object",
     "properties" : {
@@ -34,21 +37,49 @@ BAD_DATA = {"price": 5}
 #         valid, error = json_methods.validate_json(SCHEMA, GOOD_DATA)
 #         self.assertTrue(valid)
 #         self.assertIsNone(error)
-
 class TestGetAllWaypoints(unittest.TestCase):
     def test_good_data(self):
         result = read.get_all_waypoints()
-        try:
-            for x in result:
+        with Flask(__name__).app_context():
+            try:
+                for x in result:
+                    s = jsonify(results = result)
+                    print(s.response[0])
+                    print(json.dumps(x, cls=new_alchemy_encoder(), check_circular=False))
+            except Exception as e:
                 print()
-        except Exception as e:
-            print()
 
 class TestGetAllPaths(unittest.TestCase):
     def test_good_data(self):
         result = read.get_all_paths()
-        try:
-            for x in result:
+        with Flask(__name__).app_context():
+            try:
+                s = jsonify(results = result)
+                print(s.response[0])
+                print(json.dumps(result, cls=new_alchemy_encoder(), check_circular=False))
+            except Exception as e:
                 print()
-        except Exception as e:
-            print()
+
+# class TestAddUser(unittest.TestCase):
+#     def test_good_data(self):
+        # result = create.create_user({
+        #             "login": "esss",
+        #             "password": "ess",
+        #             "name": "Jack",
+        #             "surname": "Sparrow",
+        #             "args": {"handicapped": True}})
+
+class TestGetTrip(unittest.TestCase):
+    def test_good_data(self):
+        result = read.get_trip(1)
+        print()
+
+class TestGetMountainRanges(unittest.TestCase):
+    def test_good_data(self):
+        result = read.get_all_mountain_ranges()
+        print()
+
+class TestAuthUser(unittest.TestCase):
+    def test_good_data(self):
+        result = read.auth_user("es", "ess")
+        print()
