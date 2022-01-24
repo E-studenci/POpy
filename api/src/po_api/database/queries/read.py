@@ -4,7 +4,6 @@ import po_api.database.orm.models as models
 import sqlalchemy as sql
 from po_api.database.db import Database
 
-
 @DATABASE.db_query
 def get_all_waypoints(session: Session):
     return session\
@@ -19,11 +18,16 @@ def get_all_waypoints(session: Session):
         ).unique().scalars().all()
 
 @DATABASE.db_query
-def get_all_paths(session: Session, include_closed: bool):
+def get_all_paths(session: Session, include_closed: bool, waypoint_from_id: int=None):
     x = session\
         .execute(
             sql.select(models.Path)\
-                .where(include_closed or (models.Path.status == models.PathStatus.open))\
+                .where(sql.and_(sql.or_(
+                    waypoint_from_id is None, models.Path.waypoint_a_id == waypoint_from_id
+                    ),sql.or_(
+                    include_closed, models.Path.status == models.PathStatus.open)
+                    )
+                )\
                 .options(
                     joinedload(models.Path.waypoint_a)\
                         .options(
@@ -42,7 +46,9 @@ def get_trip(session:Session, trip_id: int):
         sql.select(models.Trip).where(models.Trip.id == trip_id).options(
             joinedload(models.Trip.trip_plan)\
                 .options(joinedload(models.TripPlan.segments)\
-                    .options(joinedload(models.TripSegment.path))),# add ordering
+                    .options(joinedload(models.TripSegment.path)\
+                        .options(joinedload(models.Path.waypoint_a),
+                                joinedload(models.Path.waypoint_b)))),# add ordering
             joinedload(models.Trip.participations)
             .options(
                 joinedload(models.Participation.badge_acquirement).options(
@@ -60,7 +66,9 @@ def get_trip(session:Session, trip_id: int):
 def get_pending_badge_acquirements(session: Session):
     result = session.execute(sql.select(models.BadgeAcquirement)\
         .where(models.BadgeAcquirement.status == models.BadgeAcquirementStatusEnum.waiting_for_review)\
-            .options(joinedload(models.BadgeAcquirement.got_book)\
+            .options(
+                joinedload(models.BadgeAcquirement.badge),
+                joinedload(models.BadgeAcquirement.got_book)\
                     .options(
                         joinedload(models.GotBook.owner)
                     ),

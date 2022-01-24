@@ -28,33 +28,33 @@ def tablename_to_class_name(string:str):
 
 # declarative base class
 Base = declarative_base()
-class ColorsEnum(enum.Enum):
-    red = 1
-    green = 2
-    blue = 3
-    black = 4
-    yellow = 5
-class PathStatus(enum.Enum):
-    open = 1
-    closed = 2
-class TripDifficulty(enum.Enum):
-    easy = 1
-    semi_easy = 2
-    medium = 3
-    semi_hard = 4
-    hard = 5
-class ReviewEnum(enum.Enum):
-    accepted = 1
-    rejected = 2    
-class BadgeAcquirementStatusEnum(enum.Enum):
-    collecting_points = 1
-    waiting_for_review = 2
-    acquired = 3
-    rejected = 4
-class ParticipationStatusEnum(enum.Enum):
-    waiting_for_review = 1
-    acquired = 2
-    rejected = 3
+class ColorsEnum(str, enum.Enum):
+    red = "red".capitalize()
+    green = "green".capitalize()
+    blue = "blue".capitalize()
+    black = "black".capitalize()
+    yellow = "yellow".capitalize()
+class PathStatus(str, enum.Enum):
+    open = "open".capitalize()
+    closed = "closed".capitalize()
+class TripDifficulty(str, enum.Enum):
+    easy = "easy".capitalize()
+    semi_easy = "semi_easy".capitalize()
+    medium = "medium".capitalize()
+    semi_hard = "semihard".capitalize()
+    hard = "hard".capitalize()
+class ReviewEnum(str, enum.Enum):
+    accepted = "accepted".capitalize()
+    rejected = "rejected".capitalize()    
+class BadgeAcquirementStatusEnum(str, enum.Enum):
+    collecting_points = "collecting_points".capitalize()
+    waiting_for_review = "waiting_for_review".capitalize()
+    acquired = "acquired".capitalize()
+    rejected = "rejected".capitalize()
+class ParticipationStatusEnum(str, enum.Enum):
+    waiting_for_review = "waiting_for_review".capitalize()
+    acquired = "acquired".capitalize()
+    rejected = "rejected".capitalize()
 
 trip_guides = db.Table('association', Base.metadata,
     db.Column('guide', db.ForeignKey(TABLE_USERS + '.id'), primary_key=True),
@@ -188,7 +188,7 @@ class Path(Base):
     waypoint_a_id = db.Column(db.Integer, db.ForeignKey(TABLE_WAYPOINTS + ".id"))
     waypoint_a = relationship(tablename_to_class_name(TABLE_WAYPOINTS), lazy='noload', back_populates="path_starts", foreign_keys='Path.waypoint_a_id')
     waypoint_b_id = db.Column(db.Integer, db.ForeignKey(TABLE_WAYPOINTS + ".id"))
-    waypoint_b = relationship(tablename_to_class_name(TABLE_WAYPOINTS), foreign_keys='Path.waypoint_b_id')
+    waypoint_b = relationship(tablename_to_class_name(TABLE_WAYPOINTS), lazy='noload', foreign_keys='Path.waypoint_b_id')
 
     segments = relationship(tablename_to_class_name(TABLE_TRIP_SEGMENTS), lazy='noload', back_populates="path")
 
@@ -240,11 +240,13 @@ class Badge(Base):
     id: int
     required_age: int
     required_points: int
+    name: str
     acquirements: list['BadgeAcquirement']
 
     __tablename__ = TABLE_BADGES
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(30))
     required_age = db.Column(db.Integer)
     required_points = db.Column(db.Integer)
     acquirements = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENTS), lazy='noload', back_populates="badge")

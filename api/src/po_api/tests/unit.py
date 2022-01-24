@@ -47,20 +47,21 @@ class TestGetAllWaypoints(unittest.TestCase):
             try:
                 for x in result:
                     s = jsonify(results = result)
-                    print(s.response[0])
-                    print(json.dumps(x, cls=new_alchemy_encoder(), check_circular=False))
+                    # print(s.response[0])
+                    # print(json.dumps(x, cls=new_alchemy_encoder(), check_circular=False))
             except Exception as e:
                 print()
 
 class TestGetAllPaths(unittest.TestCase):
     def test_good_data(self):
-        result1 = read.get_all_paths(False)
-        result2 = read.get_all_paths(True)
+        # result1 = read.get_all_paths(False)
+        # result2 = read.get_all_paths(True)
+        result3 = read.get_all_paths(False,1)
         with Flask(__name__).app_context():
             try:
-                s = jsonify(results = result1)
+                s = jsonify(results = result3)
                 print(s.response[0])
-                print(json.dumps(result1, cls=new_alchemy_encoder(), check_circular=False))
+                # print(json.dumps(result1, cls=new_alchemy_encoder(), check_circular=False))
             except Exception as e:
                 print()
 
@@ -76,12 +77,22 @@ class TestGetAllPaths(unittest.TestCase):
 class TestGetTrip(unittest.TestCase):
     def test_good_data(self):
         result = read.get_trip(1)
-        print()
+        with Flask(__name__).app_context():
+            try:
+                s = jsonify(results = result)
+                # print(s.response[0])
+            except Exception as e:
+                print()
 
 class TestGetMountainRanges(unittest.TestCase):
     def test_good_data(self):
         result = read.get_all_mountain_ranges()
-        print()
+        with Flask(__name__).app_context():
+            try:
+                s = jsonify(results = result)
+                # print(s.response[0])
+            except Exception as e:
+                print()
 
 class TestAuthUser(unittest.TestCase):
     def test_good_data(self):
@@ -100,49 +111,55 @@ class TestEditPath(unittest.TestCase):
 class TestGetPendingBadgeAcquirements(unittest.TestCase):
     def test_good_data(self):
         result = read.get_pending_badge_acquirements()
-        print()
+        with Flask(__name__).app_context():
+            try:
+                s = jsonify(results = result)
+                # print(s.response[0])
+            except Exception as e:
+                print()
 
-class TestReviewParticipation(unittest.TestCase):
-    def test_good_data(self):
-        result = create.review_participation({
-            "review":models.ReviewEnum.accepted,
-            "participation_id":2,
-            "reviewer_id":3,
-            "review_date":datetime.datetime.now(),
-            "earned_points":12})
-        print()
+# class TestReviewParticipation(unittest.TestCase):
+    # def test_good_data(self):
+    #     result = create.review_participation({
+    #         "review":models.ReviewEnum.accepted,
+    #         "participation_id":2,
+    #         "reviewer_id":3,
+    #         "review_date":datetime.datetime.now(),
+    #         "earned_points":12})
+    #     print()
+        
 
-class TestReviewBadgeAcquirement(unittest.TestCase):
-    def test_good_data(self):
-        result = create.review_badge_acquirement({
-            "review":models.ReviewEnum.accepted,
-            "badge_acquirement_id":2,
-            "reviewer_id":3,
-            "review_date":datetime.datetime.now(),
-            "required_points":12,
-            "earned_points":12})
-        print()
+# class TestReviewBadgeAcquirement(unittest.TestCase):
+#     def test_good_data(self):
+#         result = create.review_badge_acquirement({
+#             "review":models.ReviewEnum.accepted,
+#             "badge_acquirement_id":2,
+#             "reviewer_id":3,
+#             "review_date":datetime.datetime.now(),
+#             "required_points":12,
+#             "earned_points":12})
+#         print()
 
-class TestCreateTripPlan(unittest.TestCase):
-    def test_good_data(self):
-        result = create.create_trip_plan({
-            "name":"trip_plan_1",
-            "description":"noice!",
-            "distance":12,
-            "difficulty":models.TripDifficulty.medium,
-            "is_public":True,
-            "creator_id":3,
-            "path_ids": [1,2,3,10,11]})
-        print()
+# class TestCreateTripPlan(unittest.TestCase):
+#     def test_good_data(self):
+#         result = create.create_trip_plan({
+#             "name":"trip_plan_1",
+#             "description":"noice!",
+#             "distance":12,
+#             "difficulty":models.TripDifficulty.medium,
+#             "is_public":True,
+#             "creator_id":3,
+#             "path_ids": [1,2,3,10,11]})
+#         print()
 
-class TestCreatePath(unittest.TestCase):
-    def test_good_data(self):
-        result = create.create_path({
-            "color":models.ColorsEnum.black,
-            "is_official":True,
-            "points":3,
-            "status":models.PathStatus.open,
-            "waypoint_a_id":1,
-            "waypoint_b_id":7,
-            "distance":123})
-        print()
+# class TestCreatePath(unittest.TestCase):
+#     def test_good_data(self):
+        # result = create.create_path({
+        #     "color":models.ColorsEnum.black,
+        #     "is_official":True,
+        #     "points":3,
+        #     "status":models.PathStatus.open,
+        #     "waypoint_a_id":1,
+        #     "waypoint_b_id":7,
+        #     "distance":123})
+        # print()
