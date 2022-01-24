@@ -152,8 +152,8 @@ class Waypoint(Base):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(30))
     elevation = db.Column(db.Integer)
-    longtitude = db.Column(db.String)#TODO
-    latitude = db.Column(db.String)
+    longtitude = db.Column(db.String(40))
+    latitude = db.Column(db.String(40))
     description = db.Column(db.String(255))
 
     mountain_range_id = db.Column(db.Integer, db.ForeignKey(TABLE_MOUNTAIN_RANGES + ".id"))
@@ -170,6 +170,7 @@ class Path(Base):
     color: ColorsEnum
     is_official: bool
     points: int
+    distance: int
     status: PathStatus
     waypoint_a: 'Waypoint'
     waypoint_b: 'Waypoint'
@@ -182,6 +183,7 @@ class Path(Base):
     is_official = db.Column(db.Boolean)
     points = db.Column(db.Integer)
     status = db.Column(db.Enum(PathStatus))
+    distance = db.Column(db.Integer)
 
     waypoint_a_id = db.Column(db.Integer, db.ForeignKey(TABLE_WAYPOINTS + ".id"))
     waypoint_a = relationship(tablename_to_class_name(TABLE_WAYPOINTS), lazy='noload', back_populates="path_starts", foreign_keys='Path.waypoint_a_id')
@@ -390,7 +392,7 @@ class Trip(Base):
 if __name__ == "__main__":
     url = f'postgresql+psycopg2://postgres:AB9B75D8E128E8040A0E0D751D37393CA8D4C663@130.61.111.97:30001/test'
     engine = db.create_engine(url, echo=True)
-    Base.metadata.drop_all(engine)
+    # Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
 
