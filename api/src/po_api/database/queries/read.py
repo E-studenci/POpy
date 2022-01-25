@@ -26,6 +26,14 @@ def get_waypoint_by_name(session: Session, name: str):
         ).first()._asdict()
 
 @DATABASE.db_query
+def get_path_by_id(session: Session, id: int):
+    return session\
+        .execute(
+            sql.select(models.Path)\
+            .where(models.Path.id == id)
+        ).first()._asdict()
+
+@DATABASE.db_query
 def get_all_paths(session: Session, include_closed: bool, waypoint_from_id: int=None):
     x = session\
         .execute(

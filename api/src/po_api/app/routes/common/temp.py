@@ -27,17 +27,29 @@ def create_waypoint():
             code = 400,
             error = ResponseError(name="Invalid Data", description="waypoint name already used")
         )
-    create.create_waypoint(json_data)
-    
-    return ResponseData()
-
+    result = create.create_waypoint(json_data)
+    if isinstance(result, str):
+         return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description=result)
+        )
+    return ResponseData(
+        code=200
+    )
 
 @APP.route('/get_trip/<trip_id>', methods=['GET'])
 @BASIC_AUTH.login_required
 @response_wrapper()
 def get_trip(trip_id: str):
-    
-    return ResponseData()
+    result = read.get_trip(trip_id)
+    if result:
+        return ResponseData(
+        code=200,
+        data=jsonify(results=result)
+        )
+    return ResponseData(
+        code=400,
+        error = ResponseError(name="Invalid Data", description="trip not found") )
 
 
 @APP.route('/review_participation', methods=['POST'])
@@ -52,8 +64,11 @@ def review_participation():
 @BASIC_AUTH.login_required
 @response_wrapper()
 def get_pending_badge_acquirements():
-    
-    return ResponseData()
+    pending_badge_acquirements = read.get_pending_badge_acquirements()
+    return ResponseData(
+        code=200,
+        data=jsonify(results=pending_badge_acquirements).response[0]
+    )
 
 
 @APP.route('/review_badge_acquirement', methods=['POST'])
@@ -76,16 +91,26 @@ def create_user():
 @BASIC_AUTH.login_required
 @response_wrapper()
 def get_all_waypoints():
-    
-    return ResponseData()
+    waypoints = read.get_all_waypoints()
+    return ResponseData(
+        code=200,
+        data=jsonify(results=waypoints).response[0]
+    )
 
 
-@APP.route('/get_paths_from_waypoint/<waypoint_id>', methods=['GET'])
+@APP.route('/get_paths_from_waypoint/<waypoint_name>', methods=['GET'])
 @BASIC_AUTH.login_required
 @response_wrapper()
-def get_paths_from_waypoint(waypoint_id: str):
-    
-    return ResponseData()
+def get_paths_from_waypoint(waypoint_name: str):
+    result = read.get_waypoint_by_name(waypoint_name)
+    if result:
+        return ResponseData(
+        code=200,
+        data=jsonify(results=result)
+        )
+    return ResponseData(
+        code=400,
+        error = ResponseError(name="Invalid Data", description="waypoint not found") )
 
 
 @APP.route('/create_trip_plan', methods=['PUT'])
@@ -100,8 +125,26 @@ def create_trip_plan():
 @BASIC_AUTH.login_required
 @response_wrapper()
 def get_all_paths():
-    
-    return ResponseData()
+    paths = read.get_all_paths()
+    return ResponseData(
+        code=200,
+        data=jsonify(results=paths).response[0]
+    )
+
+
+@APP.route('/get_path/<path_id>', methods=['GET'])
+@BASIC_AUTH.login_required
+@response_wrapper(schemas.EDIT_PATH_SCHEMA)
+def edit_path(path_id: str):
+    result = read.get_path_by_id(path_id)
+    if result:
+        return ResponseData(
+        code=200,
+        data=jsonify(results=result)
+        )
+    return ResponseData(
+        code=400,
+        error = ResponseError(name="Invalid Data", description="path not found") )
 
 
 @APP.route('/create_path', methods=['PUT'])

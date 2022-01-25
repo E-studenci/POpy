@@ -73,7 +73,7 @@ class TestGetAllPaths(unittest.TestCase):
         with Flask(__name__).app_context():
             try:
                 s = jsonify(results = result3)
-                # print(s.response[0])
+                print(s.response[0])
                 # print(json.dumps(result1, cls=new_alchemy_encoder(), check_circular=False))
             except Exception as e:
                 print()
@@ -188,14 +188,14 @@ class TestGetWaypointByName(unittest.TestCase):
             except Exception as e:
                 print()
 
-class TestCreatePath(unittest.TestCase):
-    def test_good_data(self):
-        result = create.create_path({
-            "color":models.ColorsEnum.black,
-            "is_official":True,
-            "points":3,
-            "status":models.PathStatus.open,
-            "waypoint_a_id":1,
-            "waypoint_b_id":9999,
-            "distance":123})
-        print()
+# class TestCreatePath(unittest.TestCase):
+#     def test_good_data(self):
+#         result = create.create_path({
+#             "color":models.ColorsEnum.black,
+#             "is_official":True,
+#             "points":3,
+#             "status":models.PathStatus.open,
+#             "waypoint_a_id":1,
+#             "waypoint_b_id":9999,
+#             "distance":123})
+#         print()
