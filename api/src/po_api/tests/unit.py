@@ -52,6 +52,19 @@ class TestGetAllWaypoints(unittest.TestCase):
             except Exception as e:
                 print()
 
+class TestGetAllMountainRanges(unittest.TestCase):
+    def test_good_data(self):
+        result = read.get_all_mountain_ranges()
+        with Flask(__name__).app_context():
+            try:
+                for x in result:
+                    s = jsonify(results = result)
+                    # print(s.response[0])
+                    # print(json.dumps(x, cls=new_alchemy_encoder(), check_circular=False))
+            except Exception as e:
+                print()
+
+
 class TestGetAllPaths(unittest.TestCase):
     def test_good_data(self):
         # result1 = read.get_all_paths(False)
@@ -60,7 +73,7 @@ class TestGetAllPaths(unittest.TestCase):
         with Flask(__name__).app_context():
             try:
                 s = jsonify(results = result3)
-                print(s.response[0])
+                # print(s.response[0])
                 # print(json.dumps(result1, cls=new_alchemy_encoder(), check_circular=False))
             except Exception as e:
                 print()
@@ -163,3 +176,26 @@ class TestGetPendingBadgeAcquirements(unittest.TestCase):
         #     "waypoint_b_id":7,
         #     "distance":123})
         # print()
+
+class TestGetWaypointByName(unittest.TestCase):
+    def test_good_data(self):
+        result = read.get_waypoint_by_name("pkt_1")
+        result2 = read.get_waypoint_by_name("asda")
+        with Flask(__name__).app_context():
+            try:
+                s = jsonify(results = result)
+                # print(s.response[0])
+            except Exception as e:
+                print()
+
+class TestCreatePath(unittest.TestCase):
+    def test_good_data(self):
+        result = create.create_path({
+            "color":models.ColorsEnum.black,
+            "is_official":True,
+            "points":3,
+            "status":models.PathStatus.open,
+            "waypoint_a_id":1,
+            "waypoint_b_id":9999,
+            "distance":123})
+        print()

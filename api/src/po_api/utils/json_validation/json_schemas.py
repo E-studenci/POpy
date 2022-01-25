@@ -8,7 +8,7 @@ CREATE_WAYPOINT_SCHEMA = {
         "longitude": {"type" : "string"},
         "latitude": {"type" : "string"}, 
         "description": {"type" : "string"}, 
-        "mountain_range_id": {"type" : "string"},
+        "mountain_range_id": {"type" : "integer"},
     },
     "required": ["name", "elevation", "longitude", "latitude", "description", "mountain_range_id"]
 }
@@ -16,9 +16,9 @@ CREATE_WAYPOINT_SCHEMA = {
 REVIEW_PARTICIPATION_SCHEMA = {
     "type" : "object",
     "properties" : {
-        "participation_id": {"type" : "string"},
+        "participation_id": {"type" : "integer"},
         "earned_points": {"type" : "integer"},
-        "reviewer_id": {"type" : "string"},
+        "reviewer_id": {"type" : "integer"},
         "review": {"enum" : ["accepted", "rejected"]},
     },
     "required": ["participation_id", "earned_points", "reviewer_id", "review"]
@@ -54,11 +54,11 @@ CREATE_TRIP_PLAN_SCHEMA = {
         "description": {"type" : "string"},
         "difficulty": {"enum" : ["easy", "semi_easy", "medium", "semi_medium", "hard"]},
         "is_public": {"type" : "boolean"}, 
-        "creator_id": {"type" : "string"}, 
+        "creator_id": {"type" : "integer"}, 
         "paths": {
             "type" : "array",
             "items": {
-                "type": "string"
+                "type": "integer"
             }
         },
     },
@@ -71,10 +71,11 @@ CREATE_PATH_SCHEMA = {
         "color": {"enum" : ["red", "green", "blue", "black", "yellow"]},
         "is_official": {"type" : "boolean"},
         "points": {"type" : "integer"},
-        "waypoint_a_id": {"type" : "string"}, 
-        "waypoint_b_id": {"type" : "string"},
+        "waypoint_a_id": {"type" : "integer"}, 
+        "waypoint_b_id": {"type" : "integer"},
+        "distance": {"type" : "integer"},
     },
-    "required": ["color", "is_official", "points", "waypoint_a_id", "waypoint_b_id"]
+    "required": ["color", "is_official", "points", "waypoint_a_id", "waypoint_b_id", "distance"]
 }
 
 EDIT_PATH_SCHEMA = {
@@ -83,7 +84,7 @@ EDIT_PATH_SCHEMA = {
         "color": {"enum" : ["red", "green", "blue", "black", "yellow"]},
         "is_official": {"type" : "boolean"},
         "points": {"type" : "integer"},
-        "waypoint_a_id": {"type" : "string"}, 
-        "waypoint_b_id": {"type" : "string"},
+        "waypoint_a_id": {"type" : "integer"}, 
+        "waypoint_b_id": {"type" : "integer"},
     }
 }

@@ -1,20 +1,33 @@
-from po_api.app.response_parser import ResponseData, response_wrapper
+from po_api.app.response_parser import ResponseData, response_wrapper, ResponseError
 from po_api import APP, BASIC_AUTH
+from flask import jsonify, request
 import po_api.utils.json_validation.json_schemas as schemas
-
+import po_api.database.queries.read as read
+import po_api.database.queries.create as create
+import po_api.database.queries.update as update
+import po_api.database.queries.delete as delete
 
 @APP.route('/get_all_mountain_ranges', methods=['GET'])
 @BASIC_AUTH.login_required
 @response_wrapper()
 def get_all_mountain_ranges():
-    
-    return ResponseData()
-
+    mountain_ranges = read.get_all_mountain_ranges()
+    return ResponseData(
+        code=200,
+        data=jsonify(results=mountain_ranges).response[0]
+    )
 
 @APP.route('/create_waypoint', methods=['PUT'])
 @BASIC_AUTH.login_required
 @response_wrapper(schemas.CREATE_WAYPOINT_SCHEMA)
 def create_waypoint():
+    json_data = request.json
+    if read.get_waypoint_by_name(json_data["name"]):
+        return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description="waypoint name already used")
+        )
+    create.create_waypoint(json_data)
     
     return ResponseData()
 

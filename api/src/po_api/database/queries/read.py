@@ -18,6 +18,14 @@ def get_all_waypoints(session: Session):
         ).unique().scalars().all()
 
 @DATABASE.db_query
+def get_waypoint_by_name(session: Session, name: str):
+    return session\
+        .execute(
+            sql.select(models.Waypoint)\
+            .where(models.Waypoint.name == name)
+        ).first()._asdict()
+
+@DATABASE.db_query
 def get_all_paths(session: Session, include_closed: bool, waypoint_from_id: int=None):
     x = session\
         .execute(
@@ -59,7 +67,7 @@ def get_trip(session:Session, trip_id: int):
             )
         )
     ) 
-    result = result.unique().scalars().all()
+    result = result.first()._asdict()
     return result
 
 @DATABASE.db_query

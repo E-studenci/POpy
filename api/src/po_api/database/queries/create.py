@@ -127,6 +127,21 @@ def create_path(session:Session, path: dict):
             .execute(sql.insert(models.Path)\
                 .values(path)
             )
+    except Exception as e:
+        session.rollback()
+        raise
+    else:
+        session.commit()
+    return inserted_path
+
+@DATABASE.db_query
+def create_waypoint(session:Session, waypoint: dict):
+    session.begin()
+    try:
+        inserted_path = session\
+            .execute(sql.insert(models.Waypoint)\
+                .values(waypoint)
+            )
     except:
         session.rollback()
         raise

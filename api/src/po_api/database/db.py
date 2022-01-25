@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import Session
 from functools import wraps
 import typing as t
@@ -21,10 +21,13 @@ class Database:
                     with Session(bind=connection) as session:
                         result = func(session, *args , **kwargs)
                     return result
+            except IntegrityError as int_error:
+                return int_error.orig.pgerror
             except SQLAlchemyError as db_error:
                 logging.error(db_error)
                 raise DBConnectionError()
             except Exception as error:
                 logging.error(error)
+                raise
         return wrapper
 
