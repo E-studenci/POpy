@@ -115,9 +115,10 @@ class TestAuthUser(unittest.TestCase):
 class TestEditPath(unittest.TestCase):
     def test_good_data(self):
         result = update.update_path(4, {
-            "color": models.ColorsEnum.blue,
+            "color": models.ColorsEnum.red,
             "is_official": True,
-            "waypoint_a_id": 4
+            "waypoint_a_id": 4,
+            "status": "open"
             })
         print()
 

@@ -6,6 +6,7 @@ import po_api.database.queries.read as read
 import po_api.database.queries.create as create
 import po_api.database.queries.update as update
 import po_api.database.queries.delete as delete
+import po_api.database.orm.models as models
 
 @APP.route('/get_all_mountain_ranges', methods=['GET'])
 @BASIC_AUTH.login_required
@@ -40,7 +41,7 @@ def create_waypoint():
 @APP.route('/get_trip/<trip_id>', methods=['GET'])
 @BASIC_AUTH.login_required
 @response_wrapper()
-def get_trip(trip_id: str):
+def get_trip(trip_id: int):
     result = read.get_trip(trip_id)
     if result:
         return ResponseData(
@@ -56,8 +57,16 @@ def get_trip(trip_id: str):
 @BASIC_AUTH.login_required
 @response_wrapper(schemas.REVIEW_PARTICIPATION_SCHEMA)
 def review_participation():
-    
-    return ResponseData()
+    json_data = request.json
+    result = create.review_participation(json_data)
+    if isinstance(result, str):
+         return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description=result)
+        )
+    return ResponseData(
+        code=200
+    )
 
 
 @APP.route('/get_pending_badge_acquirements', methods=['GET'])
@@ -75,16 +84,32 @@ def get_pending_badge_acquirements():
 @BASIC_AUTH.login_required
 @response_wrapper(schemas.REVIEW_BADGE_ACQUIREMENT_SCHEMA)
 def review_badge_acquirement():
-    
-    return ResponseData()
+    json_data = request.json
+    result = create.review_badge_acquirement(json_data)
+    if isinstance(result, str):
+         return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description=result)
+        )
+    return ResponseData(
+        code=200
+    )
 
 
 @APP.route('/create_user', methods=['PUT'])
 @BASIC_AUTH.login_required
 @response_wrapper(schemas.CREATE_USER_SCHEMA)
 def create_user():
-    
-    return ResponseData()
+    json_data = request.json
+    result = create.create_user(json_data)
+    if isinstance(result, str):
+         return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description=result)
+        )
+    return ResponseData(
+        code=200
+    )
 
 
 @APP.route('/get_all_waypoints', methods=['GET'])
@@ -117,8 +142,16 @@ def get_paths_from_waypoint(waypoint_name: str):
 @BASIC_AUTH.login_required
 @response_wrapper(schemas.CREATE_TRIP_PLAN_SCHEMA)
 def create_trip_plan():
-    
-    return ResponseData()
+    json_data = request.json
+    result = create.create_trip_plan(json_data)
+    if isinstance(result, str):
+         return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description=result)
+        )
+    return ResponseData(
+        code=200
+    )
 
 
 @APP.route('/get_all_paths', methods=['GET'])
@@ -135,7 +168,7 @@ def get_all_paths():
 @APP.route('/get_path/<path_id>', methods=['GET'])
 @BASIC_AUTH.login_required
 @response_wrapper(schemas.EDIT_PATH_SCHEMA)
-def edit_path(path_id: str):
+def edit_path(path_id: int):
     result = read.get_path_by_id(path_id)
     if result:
         return ResponseData(
@@ -151,20 +184,53 @@ def edit_path(path_id: str):
 @BASIC_AUTH.login_required
 @response_wrapper(schemas.CREATE_PATH_SCHEMA)
 def create_path():
-    
-    return ResponseData()
+    json_data = request.json
+    result = create.create_path(json_data)
+    if isinstance(result, str):
+         return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description=result)
+        )
+    return ResponseData(
+        code=200
+    )
 
 
 @APP.route('/edit_path/<path_id>', methods=['PATCH'])
 @BASIC_AUTH.login_required
 @response_wrapper(schemas.EDIT_PATH_SCHEMA)
-def edit_path(path_id: str):
-    
-    return ResponseData()
+def edit_path(path_id: int):
+    json_data = request.json
+    result = update.update_path(path_id, json_data)
+    if isinstance(result, str):
+         return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description=result)
+        )
+    if result.rowcount == 0:
+        return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description="Path not found")
+        )
+    return ResponseData(
+        code=200
+    )
 
 @APP.route('/delete_path/<path_id>', methods=['PATCH'])
 @BASIC_AUTH.login_required
 @response_wrapper()
-def delete_path(path_id: str):
-    
-    return ResponseData()
+def delete_path(path_id: int):
+    result = update.update_path(path_id, {"status": models.PathStatus.closed})
+    if isinstance(result, str):
+         return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description=result)
+        )
+    if result.rowcount == 0:
+        return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description="Path not found")
+        )
+    return ResponseData(
+        code=200
+    )
