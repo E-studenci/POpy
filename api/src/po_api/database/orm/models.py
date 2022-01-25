@@ -94,6 +94,30 @@ class User(Base):
     guided_trips = relationship(tablename_to_class_name(TABLE_TRIPS), secondary=trip_guides, lazy='noload', back_populates="guides")
     trip_plans = relationship(tablename_to_class_name(TABLE_TRIP_PLANS), lazy='noload', back_populates="creator")  
 
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.get_id() == other.get_id()
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
 @dataclass
 class Role(Base):
     id:int

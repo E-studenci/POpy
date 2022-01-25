@@ -31,7 +31,7 @@ def get_path_by_id(session: Session, id: int):
         .execute(
             sql.select(models.Path)\
             .where(models.Path.id == id)
-        ).first()._asdict()
+        ).first()
 
 @DATABASE.db_query
 def get_all_paths(session: Session, include_closed: bool, waypoint_from_id: int=None):
@@ -75,7 +75,7 @@ def get_trip(session:Session, trip_id: int):
             )
         )
     ) 
-    result = result.first()._asdict()
+    result = result.first()
     return result
 
 @DATABASE.db_query
@@ -100,7 +100,7 @@ def get_pending_badge_acquirements(session: Session):
 def auth_user(session: Session, login: str, password:str):
     result = session.execute(sql.select(models.User)\
         .where(models.User.login == login and models.User.password == password))
-    return result.unique().scalars().all()
+    return result.first()
 
 @DATABASE.db_query
 def get_all_mountain_ranges(session: Session):
