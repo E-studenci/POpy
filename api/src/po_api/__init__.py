@@ -1,7 +1,6 @@
 from flask_httpauth import HTTPBasicAuth
 from flask_login import LoginManager
 from flask_cors import CORS
-
 from po_api.utils.config import Environment
 from po_api.database.db import Database
 from po_api.app.app import App

@@ -1,5 +1,10 @@
 import po_api.app.routes.authorization.logout
 import po_api.app.routes.authorization.login
+import po_api.app.routes.common.waypoint
+import po_api.app.routes.common.reviews
+import po_api.app.routes.common.user
+import po_api.app.routes.common.path
+import po_api.app.routes.common.trip
 import po_api.app.auth.login_manager
 import po_api.app.auth.basic_auth
 import po_api.app.error_handlers
