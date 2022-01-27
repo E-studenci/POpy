@@ -34,6 +34,15 @@ def get_path_by_id(session: Session, id: int):
         ).first()
 
 @DATABASE.db_query
+def get_user_by_id(session: Session, id: int):
+    return session\
+        .execute(
+            sql.select(models.User)\
+            .where(models.User.id == id)
+        ).first()
+
+
+@DATABASE.db_query
 def get_all_paths(session: Session, include_closed: bool, waypoint_from_id: int=None):
     x = session\
         .execute(
