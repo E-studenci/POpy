@@ -22,6 +22,7 @@ setup(
         'pyrsistent==0.18.1',
         'SQLAlchemy==1.4.31',
         'Werkzeug==2.0.2',
+        'python-dotenv==0.19.2'
     ],
     include_package_data=True
 )

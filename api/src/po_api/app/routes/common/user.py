@@ -1,6 +1,8 @@
 from po_api.app.response_parser import ResponseData, response_wrapper, ResponseError
-from po_api import APP, BASIC_AUTH
+from flask_login import login_required
 from flask import jsonify, request
+from po_api import APP
+
 import po_api.utils.json_validation.json_schemas as schemas
 import po_api.database.queries.read as read
 import po_api.database.queries.create as create
@@ -10,8 +12,8 @@ import po_api.database.orm.models as models
 
 USER_PATH="/user"
 
-@APP.route(f'{USER_PATH}/create', methods=['PUT'])
-@BASIC_AUTH.login_required
+@APP.route(f'{USER_PATH}', methods=['PUT'])
+@login_required
 @response_wrapper(schemas.CREATE_USER_SCHEMA)
 def create_user():
     json_data = request.json

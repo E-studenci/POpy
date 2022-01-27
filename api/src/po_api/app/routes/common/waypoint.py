@@ -1,6 +1,8 @@
 from po_api.app.response_parser import ResponseData, response_wrapper, ResponseError
-from po_api import APP, BASIC_AUTH
+from flask_login import login_required
 from flask import jsonify, request
+from po_api import APP
+
 import po_api.utils.json_validation.json_schemas as schemas
 import po_api.database.queries.read as read
 import po_api.database.queries.create as create
@@ -11,7 +13,7 @@ import po_api.database.orm.models as models
 WAYPOINT_PATH="/waypoint"
 
 @APP.route(f'{WAYPOINT_PATH}/get_mountain_ranges', methods=['GET'])
-@BASIC_AUTH.login_required
+@login_required
 @response_wrapper()
 def get_all_mountain_ranges():
     mountain_ranges = read.get_all_mountain_ranges()
@@ -21,8 +23,8 @@ def get_all_mountain_ranges():
     )
 
 
-@APP.route(f'{WAYPOINT_PATH}/create', methods=['PUT'])
-@BASIC_AUTH.login_required
+@APP.route(f'{WAYPOINT_PATH}', methods=['POST'])
+@login_required
 @response_wrapper(schemas.CREATE_WAYPOINT_SCHEMA)
 def create_waypoint():
     json_data = request.json
@@ -41,8 +43,8 @@ def create_waypoint():
         code=200
     )
 
-@APP.route(f'{WAYPOINT_PATH}/get', methods=['GET'])
-@BASIC_AUTH.login_required
+@APP.route(f'{WAYPOINT_PATH}', methods=['GET'])
+@login_required
 @response_wrapper()
 def get_all_waypoints():
     waypoints = read.get_all_waypoints()

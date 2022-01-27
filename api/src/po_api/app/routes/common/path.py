@@ -1,6 +1,7 @@
 from po_api.app.response_parser import ResponseData, response_wrapper, ResponseError
-from po_api import APP, BASIC_AUTH
+from flask_login import login_required
 from flask import jsonify, request
+from po_api import APP
 
 import po_api.utils.json_validation.json_schemas as schemas
 import po_api.database.queries.read as read
@@ -11,8 +12,8 @@ import po_api.database.orm.models as models
 
 PATH_PATH="/path"
 
-@APP.route(f'{PATH_PATH}/get', methods=['GET'])
-@BASIC_AUTH.login_required
+@APP.route(f'{PATH_PATH}', methods=['GET'])
+@login_required
 @response_wrapper()
 def get_all_paths():
     paths = read.get_all_paths()
@@ -21,8 +22,8 @@ def get_all_paths():
         data=jsonify(results=paths).response[0]
     )
 
-@APP.route(f'{PATH_PATH}/get/<path_id>', methods=['GET'])
-@BASIC_AUTH.login_required
+@APP.route(f'{PATH_PATH}/<path_id>', methods=['GET'])
+@login_required
 @response_wrapper(schemas.EDIT_PATH_SCHEMA)
 def get_path(path_id: int):
     result = read.get_path_by_id(path_id)
@@ -35,8 +36,8 @@ def get_path(path_id: int):
         code=400,
         error = ResponseError(name="Invalid Data", description="path not found") )
 
-@APP.route(f'{PATH_PATH}/get/from_waypoint/<waypoint_id>', methods=['GET'])
-@BASIC_AUTH.login_required
+@APP.route(f'{PATH_PATH}/from_waypoint/<waypoint_id>', methods=['GET'])
+@login_required
 @response_wrapper()
 def get_paths_from_waypoint(waypoint_id: int):
     result = read.get_all_paths(False, waypoint_id)
@@ -50,8 +51,8 @@ def get_paths_from_waypoint(waypoint_id: int):
         error = ResponseError(name="Invalid Data", description="waypoint not found") )
 
 
-@APP.route(f'{PATH_PATH}/create', methods=['PUT'])
-@BASIC_AUTH.login_required
+@APP.route(f'{PATH_PATH}', methods=['PUT'])
+@login_required
 @response_wrapper(schemas.CREATE_PATH_SCHEMA)
 def create_path():
     json_data = request.json
@@ -65,8 +66,8 @@ def create_path():
         code=200
     )
 
-@APP.route(f'{PATH_PATH}/edit/<path_id>', methods=['PATCH'])
-@BASIC_AUTH.login_required
+@APP.route(f'{PATH_PATH}/<path_id>', methods=['PATCH'])
+@login_required
 @response_wrapper(schemas.EDIT_PATH_SCHEMA)
 def edit_path(path_id: int):
     json_data = request.json
@@ -85,8 +86,8 @@ def edit_path(path_id: int):
         code=200
     )
 
-@APP.route(f'{PATH_PATH}/delete/<path_id>', methods=['PATCH'])
-@BASIC_AUTH.login_required
+@APP.route(f'{PATH_PATH}/<path_id>', methods=['PATCH'])
+@login_required
 @response_wrapper()
 def delete_path(path_id: int):
     result = update.update_path(path_id, {"status": models.PathStatus.closed})

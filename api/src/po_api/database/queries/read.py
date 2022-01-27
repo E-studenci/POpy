@@ -108,7 +108,7 @@ def get_pending_badge_acquirements(session: Session):
 @DATABASE.db_query
 def auth_user(session: Session, login: str, password:str):
     result = session.execute(sql.select(models.User)\
-        .where(models.User.login == login and models.User.password == password))
+        .where(sql.and_(models.User.login == login, models.User.password == password)))
     return result.first()
 
 @DATABASE.db_query

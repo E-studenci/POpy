@@ -1,6 +1,8 @@
 from po_api.app.response_parser import ResponseData, response_wrapper, ResponseError
-from po_api import APP, BASIC_AUTH
+from flask_login import login_required
 from flask import jsonify, request
+from po_api import APP
+
 import po_api.utils.json_validation.json_schemas as schemas
 import po_api.database.queries.read as read
 import po_api.database.queries.create as create
@@ -10,8 +12,8 @@ import po_api.database.orm.models as models
 
 TRIP_PATH = "/trip"
 
-@APP.route(f'{TRIP_PATH}/get/<trip_id>', methods=['GET'])
-@BASIC_AUTH.login_required
+@APP.route(f'{TRIP_PATH}/<trip_id>', methods=['GET'])
+@login_required
 @response_wrapper()
 def get_trip(trip_id: int):
     result = read.get_trip(trip_id)
@@ -24,8 +26,8 @@ def get_trip(trip_id: int):
         code=400,
         error = ResponseError(name="Invalid Data", description="trip not found") )
 
-@APP.route(f'{TRIP_PATH}/create_trip_plan', methods=['PUT'])
-@BASIC_AUTH.login_required
+@APP.route(f'{TRIP_PATH}/create_trip_plan', methods=['POST'])
+@login_required
 @response_wrapper(schemas.CREATE_TRIP_PLAN_SCHEMA)
 def create_trip_plan():
     json_data = request.json
