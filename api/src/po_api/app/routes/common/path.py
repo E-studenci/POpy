@@ -23,7 +23,7 @@ def get_all_paths():
 @APP.route(f'{PATH_PATH}/get/<path_id>', methods=['GET'])
 @BASIC_AUTH.login_required
 @response_wrapper(schemas.EDIT_PATH_SCHEMA)
-def edit_path(path_id: int):
+def get_path(path_id: int):
     result = read.get_path_by_id(path_id)
     if result:
         return ResponseData(
@@ -34,11 +34,11 @@ def edit_path(path_id: int):
         code=400,
         error = ResponseError(name="Invalid Data", description="path not found") )
 
-@APP.route(f'{PATH_PATH}/get/from_waypoint/<waypoint_name>', methods=['GET'])
+@APP.route(f'{PATH_PATH}/get/from_waypoint/<waypoint_id>', methods=['GET'])
 @BASIC_AUTH.login_required
 @response_wrapper()
-def get_paths_from_waypoint(waypoint_name: str):
-    result = read.get_waypoint_by_name(waypoint_name)
+def get_paths_from_waypoint(waypoint_id: int):
+    result = read.get_all_paths(False, waypoint_id)
     if result:
         return ResponseData(
         code=200,
