@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Flask from module",
+            "name": "Module",
             "type": "python",
             "request": "launch",
             "module": "flask",
             "env": { 
-                "FLASK_APP": "api",
+                "FLASK_APP": "po_api",
                 "FLASK_ENV": "development" 
             },
             "envFile": "${workspaceFolder}/api/.env",
@@ -19,13 +19,38 @@
             "justMyCode": false
         },
         {
-            "name": "Python: Current File",
+            "name": "Code",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": { 
+                "FLASK_APP": "po_api",
+                "FLASK_ENV": "development",
+                "PYTHONPATH": "${workspaceFolder}/api/src${pathSeparator}${env:PYTHONPATH}" 
+            },
+            "envFile": "${workspaceFolder}/api/.env",
+            "args": ["run", "--no-debugger", "--no-reload"],
+            "jinja": true,
+            "justMyCode": false
+        },
+        {
+            "name": "Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/api/src/po_api/__main__.py",
+            "envFile": "${workspaceFolder}/api/.env",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/api/src${pathSeparator}${env:PYTHONPATH}"
+            }
+        },
+        {
+            "name": "File",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}/rest/src${pathSeparator}${env:PYTHONPATH}"
+                "PYTHONPATH": "${workspaceFolder}/api/src/;${env:PYTHONPATH}"
             }
         }
     ]
