@@ -28,9 +28,10 @@ def get_all_paths():
 def get_path(path_id: int):
     result = read.get_path_by_id(path_id)
     if result:
+
         return ResponseData(
         code=200,
-        data=jsonify(results=result)
+        data=jsonify(results=result[0]).response[0]
         )
     return ResponseData(
         code=400,
@@ -44,7 +45,7 @@ def get_paths_from_waypoint(waypoint_id: int):
     if result:
         return ResponseData(
         code=200,
-        data=jsonify(results=result)
+        data=jsonify(results=result).response[0]
         )
     return ResponseData(
         code=400,

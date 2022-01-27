@@ -4,7 +4,7 @@ import po_api.database.orm.models as models
 import sqlalchemy as sql
 from po_api.database.db import Database
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def get_all_waypoints(session: Session):
     return session\
         .execute(
@@ -17,15 +17,15 @@ def get_all_waypoints(session: Session):
                 )
         ).unique().scalars().all()
 
-@DATABASE.db_query
+@DATABASE.db_query(True)
 def get_waypoint_by_name(session: Session, name: str):
     return session\
         .execute(
             sql.select(models.Waypoint)\
             .where(models.Waypoint.name == name)
-        ).first()._asdict()
+        ).first()
 
-@DATABASE.db_query
+@DATABASE.db_query(True)
 def get_path_by_id(session: Session, id: int):
     return session\
         .execute(
@@ -33,7 +33,7 @@ def get_path_by_id(session: Session, id: int):
             .where(models.Path.id == id)
         ).first()
 
-@DATABASE.db_query
+@DATABASE.db_query(True)
 def get_user_by_id(session: Session, id: int):
     return session\
         .execute(
@@ -42,7 +42,7 @@ def get_user_by_id(session: Session, id: int):
         ).first()
 
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def get_all_paths(session: Session, include_closed: bool, waypoint_from_id: int=None):
     x = session\
         .execute(
@@ -65,7 +65,7 @@ def get_all_paths(session: Session, include_closed: bool, waypoint_from_id: int=
         ).scalars().all()
     return x
 
-@DATABASE.db_query
+@DATABASE.db_query(True)
 def get_trip(session:Session, trip_id: int):
     result = session.execute(
         sql.select(models.Trip).where(models.Trip.id == trip_id).options(
@@ -87,7 +87,7 @@ def get_trip(session:Session, trip_id: int):
     result = result.first()
     return result
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def get_pending_badge_acquirements(session: Session):
     result = session.execute(sql.select(models.BadgeAcquirement)\
         .where(models.BadgeAcquirement.status == models.BadgeAcquirementStatusEnum.waiting_for_review)\
@@ -105,13 +105,13 @@ def get_pending_badge_acquirements(session: Session):
     )
     return result.unique().scalars().all()
 
-@DATABASE.db_query
+@DATABASE.db_query(True)
 def auth_user(session: Session, login: str, password:str):
     result = session.execute(sql.select(models.User)\
         .where(sql.and_(models.User.login == login, models.User.password == password)))
     return result.first()
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def get_all_mountain_ranges(session: Session):
     result = session\
         .execute(

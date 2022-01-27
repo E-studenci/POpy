@@ -5,7 +5,7 @@ import sqlalchemy as sql
 from po_api.database.db import Database
 
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def update_path(session: Session, path_id:int, changes: dict):
     session.begin()
     try:

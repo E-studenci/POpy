@@ -11,8 +11,6 @@ def verify_password(username, password):
         user = read.auth_user(username, password)
     except DBConnectionError:
         abort(500)
-    if user:
-        return user[0]
     return user
 
 

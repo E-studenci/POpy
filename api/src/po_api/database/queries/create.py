@@ -6,7 +6,7 @@ import sqlalchemy as sql
 from po_api.database.db import Database
 
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def create_user(session:Session, user: dict):
     session.begin()
     try:
@@ -32,7 +32,7 @@ def create_user(session:Session, user: dict):
         session.commit()
     return inserted_user
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def review_badge_acquirement(session: Session, badge_acquirement_review: dict):
     session.begin()
     try:
@@ -59,7 +59,7 @@ def review_badge_acquirement(session: Session, badge_acquirement_review: dict):
         session.commit()
     return inserted_review
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def review_participation(session: Session, participation_review:dict):
     session.begin()
     try:
@@ -85,7 +85,7 @@ def review_participation(session: Session, participation_review:dict):
         session.commit()
     return inserted_review
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def create_trip_plan(session:Session, trip_plan: dict):
     session.begin()
     try:
@@ -119,7 +119,7 @@ def create_trip_plan(session:Session, trip_plan: dict):
         session.commit()
     return inserted_trip_plan
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def create_path(session:Session, path: dict):
     session.begin()
     try:
@@ -134,7 +134,7 @@ def create_path(session:Session, path: dict):
         session.commit()
     return inserted_path
 
-@DATABASE.db_query
+@DATABASE.db_query()
 def create_waypoint(session:Session, waypoint: dict):
     session.begin()
     try:

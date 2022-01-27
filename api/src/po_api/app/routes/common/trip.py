@@ -20,7 +20,7 @@ def get_trip(trip_id: int):
     if result:
         return ResponseData(
         code=200,
-        data=jsonify(results=result)
+        data=jsonify(results=result).response[0]
         )
     return ResponseData(
         code=400,
