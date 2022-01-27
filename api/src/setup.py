@@ -10,7 +10,7 @@ setup(
         'click==8.0.3',
         'colorama==0.4.4',
         'Flask==2.0.2',
-        'Flask_Cors-3.0.10',
+        'Flask-Cors==3.0.10',
         'Flask-HTTPAuth==4.5.0',
         'Flask-Login==0.5.0',
         'greenlet==1.1.2',
