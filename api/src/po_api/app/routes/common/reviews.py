@@ -55,3 +55,17 @@ def review_badge_acquirement():
     return ResponseData(
         code=200
     )
+
+@APP.route(f'{REVIEW_PATH}/review_badge_acquirement', methods=['GET'])
+@login_required
+@response_wrapper()
+def review_badge_acquirement():
+    result = read.get_badge_acquirement_by_id()
+    if result:
+        return ResponseData(
+        code=200,
+        data=jsonify(data=result).json["data"]
+        )
+    return ResponseData(
+        code=400,
+        error = ResponseError(name="Invalid Data", description="badge acquirement not found") )

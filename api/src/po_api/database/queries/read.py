@@ -115,6 +115,27 @@ def get_pending_badge_acquirements(session: Session):
     )
     return result.unique().scalars().all()
 
+
+@DATABASE.db_query(True)
+def get_badge_acquirement_by_id(session: Session, id: int):
+    result = session.execute(sql.select(models.BadgeAcquirement)\
+        .where(models.BadgeAcquirement.id == id)\
+            .options(
+                joinedload(models.BadgeAcquirement.badge),
+                joinedload(models.BadgeAcquirement.got_book)\
+                    .options(
+                        joinedload(models.GotBook.owner)\
+                            .options(joinedload(models.User.roles))
+                    ),
+                    joinedload(models.BadgeAcquirement.participations)\
+                        .options(joinedload(models.Participation.participation_reviews)\
+                            .options(joinedload(models.ParticipationReview.reviewer))
+                        )
+            )
+    )
+    return result.first()
+
+
 @DATABASE.db_query(True)
 def auth_user(session: Session, login: str, password:str):
     result = session.execute(sql.select(models.User)\
