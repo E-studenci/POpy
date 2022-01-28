@@ -40,10 +40,14 @@ REVIEW_BADGE_ACQUIREMENT_SCHEMA = {
 CREATE_USER_SCHEMA = {
     "type" : "object",
     "properties" : {
-        "login": {"type" : "string"},
-        "password": {"type" : "string"},
-        "name": {"type" : "string"},
-        "surname": {"type" : "string"}, 
+        "login": {"type" : "string",
+                 "maxLength": 30},
+        "password": {"type" : "string",
+                    "maxLength": 255},
+        "name": {"type" : "string",
+                "maxLength": 30},
+        "surname": {"type" : "string",
+                    "maxLength": 30}, 
         "args": {"type": "object",
             "properties": {
                 "is_handicapped": { "type": "boolean" },
@@ -60,8 +64,10 @@ CREATE_USER_SCHEMA = {
 CREATE_TRIP_PLAN_SCHEMA = {
     "type" : "object",
     "properties" : {
-        "name": {"type" : "string"},
-        "description": {"type" : "string"},
+        "name": {"type" : "string",
+                "maxLength": 30},
+        "description": {"type" : "string",
+                        "maxLength": 255},
         "difficulty": {"enum" : ["easy", "semi_easy", "medium", "semi_medium", "hard"]},
         "is_public": {"type" : "boolean"}, 
         "creator_id": {"type" : "integer"}, 
