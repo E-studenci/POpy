@@ -1,6 +1,6 @@
 from po_api.app.response_parser import ResponseData, response_wrapper, ResponseError
 from flask_login import login_required
-from flask import jsonify, request
+from flask import jsonify, request, Flask
 from po_api import APP
 
 import po_api.utils.json_validation.json_schemas as schemas
@@ -19,19 +19,18 @@ def get_all_paths():
     paths = read.get_all_paths()
     return ResponseData(
         code=200,
-        data=jsonify(results=paths).response[0]
+        data=jsonify(data=paths).json["data"]
     )
 
 @APP.route(f'{PATH_PATH}/<path_id>', methods=['GET'])
 @login_required
-@response_wrapper(schemas.EDIT_PATH_SCHEMA)
+@response_wrapper()
 def get_path(path_id: int):
     result = read.get_path_by_id(path_id)
     if result:
-
         return ResponseData(
         code=200,
-        data=jsonify(results=result[0]).response[0]
+        data=jsonify(data=result).json["data"]
         )
     return ResponseData(
         code=400,
@@ -45,7 +44,7 @@ def get_paths_from_waypoint(waypoint_id: int):
     if result:
         return ResponseData(
         code=200,
-        data=jsonify(results=result).response[0]
+        data=jsonify(data=result).json["data"]
         )
     return ResponseData(
         code=400,

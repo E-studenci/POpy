@@ -43,7 +43,7 @@ def get_user_by_id(session: Session, id: int):
 
 
 @DATABASE.db_query()
-def get_all_paths(session: Session, include_closed: bool, waypoint_from_id: int=None):
+def get_all_paths(session: Session, include_closed: bool= True, waypoint_from_id: int=None):
     x = session\
         .execute(
             sql.select(models.Path)\

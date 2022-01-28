@@ -12,14 +12,14 @@ import po_api.database.orm.models as models
 
 REVIEW_PATH="/review"
 
-@APP.route(f'{REVIEW_PATH}/get_pending_badge_acquirements', methods=['GET'])
+@APP.route(f'{REVIEW_PATH}/pending_badge_acquirements', methods=['GET'])
 @login_required
 @response_wrapper()
-def get_pending_badge_acquirements():
+def pending_badge_acquirements():
     pending_badge_acquirements = read.get_pending_badge_acquirements()
     return ResponseData(
         code=200,
-        data=jsonify(results=pending_badge_acquirements).response[0]
+        data=jsonify(data=pending_badge_acquirements).json["data"]
     )
 
 @APP.route(f'{REVIEW_PATH}/review_participation', methods=['POST'])

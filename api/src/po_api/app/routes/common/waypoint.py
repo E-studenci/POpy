@@ -12,14 +12,14 @@ import po_api.database.orm.models as models
 
 WAYPOINT_PATH="/waypoint"
 
-@APP.route(f'{WAYPOINT_PATH}/get_mountain_ranges', methods=['GET'])
+@APP.route(f'{WAYPOINT_PATH}/mountain_ranges', methods=['GET'])
 @login_required
 @response_wrapper()
 def get_all_mountain_ranges():
     mountain_ranges = read.get_all_mountain_ranges()
     return ResponseData(
         code=200,
-        data=jsonify(results=mountain_ranges).response[0]
+        data=jsonify(data=mountain_ranges).json["data"]
     )
 
 
@@ -50,5 +50,5 @@ def get_all_waypoints():
     waypoints = read.get_all_waypoints()
     return ResponseData(
         code=200,
-        data=jsonify(results=waypoints).response[0]
+        data=jsonify(data=waypoints).json["data"]
     )
