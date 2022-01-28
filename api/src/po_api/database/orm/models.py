@@ -53,7 +53,7 @@ class BadgeAcquirementStatusEnum(str, enum.Enum):
     rejected = "rejected"
 class ParticipationStatusEnum(str, enum.Enum):
     waiting_for_review = "waiting_for_review"
-    acquired = "accepted"
+    acquired = "acquired"
     rejected = "rejected"
 
 trip_guides = db.Table('association', Base.metadata,
