@@ -1,3 +1,4 @@
+import datetime
 from po_api.app.response_parser import ResponseData, response_wrapper, ResponseError
 from flask_login import login_required
 from flask import jsonify, request
@@ -27,6 +28,7 @@ def pending_badge_acquirements():
 @response_wrapper(schemas.REVIEW_PARTICIPATION_SCHEMA)
 def review_participation():
     json_data = request.json
+    json_data["review_date"] = datetime.datetime.now()
     result = create.review_participation(json_data)
     if isinstance(result, str):
          return ResponseData(
@@ -43,6 +45,7 @@ def review_participation():
 @response_wrapper(schemas.REVIEW_BADGE_ACQUIREMENT_SCHEMA)
 def review_badge_acquirement():
     json_data = request.json
+    json_data["review_date"] = datetime.datetime.now()
     result = create.review_badge_acquirement(json_data)
     if isinstance(result, str):
          return ResponseData(

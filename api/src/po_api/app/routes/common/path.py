@@ -51,7 +51,7 @@ def get_paths_from_waypoint(waypoint_id: int):
         error = ResponseError(name="Invalid Data", description="waypoint not found") )
 
 
-@APP.route(f'{PATH_PATH}', methods=['PUT'])
+@APP.route(f'{PATH_PATH}', methods=['POST'])
 @login_required
 @response_wrapper(schemas.CREATE_PATH_SCHEMA)
 def create_path():
@@ -86,7 +86,7 @@ def edit_path(path_id: int):
         code=200
     )
 
-@APP.route(f'{PATH_PATH}/<path_id>', methods=['PATCH'])
+@APP.route(f'{PATH_PATH}/<path_id>', methods=['DELETE'])
 @login_required
 @response_wrapper()
 def delete_path(path_id: int):

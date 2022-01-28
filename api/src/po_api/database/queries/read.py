@@ -95,7 +95,8 @@ def get_pending_badge_acquirements(session: Session):
                 joinedload(models.BadgeAcquirement.badge),
                 joinedload(models.BadgeAcquirement.got_book)\
                     .options(
-                        joinedload(models.GotBook.owner)
+                        joinedload(models.GotBook.owner)\
+                            .options(joinedload(models.User.roles))
                     ),
                     joinedload(models.BadgeAcquirement.participations)\
                         .options(joinedload(models.Participation.participation_reviews)\

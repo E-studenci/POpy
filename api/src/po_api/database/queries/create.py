@@ -10,6 +10,7 @@ from po_api.database.db import Database
 def create_user(session:Session, user: dict):
     session.begin()
     try:
+        args = user.pop("args")
         inserted_user = session\
             .execute(sql.insert(models.User)\
                 .values(
@@ -23,7 +24,7 @@ def create_user(session:Session, user: dict):
                     role_id=sql\
                         .select(models.Role.id)\
                             .where(models.Role.name == "Tourist").scalar_subquery(),
-                    args=user["args"]
+                    args=args
                 ))
     except:
         session.rollback()
@@ -43,9 +44,9 @@ def review_badge_acquirement(session: Session, badge_acquirement_review: dict):
                 )
             )
         badge_acquirement_status =\
-             models.BadgeAcquirementStatusEnum.acquired\
-                  if badge_acquirement_review["review"]==models.ReviewEnum.accepted\
-                  else models.BadgeAcquirementStatusEnum.rejected 
+            models.BadgeAcquirementStatusEnum.acquired\
+                if badge_acquirement_review["review"]==models.ReviewEnum.accepted\
+                else models.BadgeAcquirementStatusEnum.rejected 
         updated_badge_acquirement = session\
             .execute(sql.update(models.BadgeAcquirement)\
                 .where(
@@ -70,9 +71,9 @@ def review_participation(session: Session, participation_review:dict):
                 )
             )
         participation_status =\
-             models.ParticipationStatusEnum.acquired\
-                  if participation_review["review"]==models.ReviewEnum.accepted\
-                  else models.ParticipationStatusEnum.rejected 
+            models.ParticipationStatusEnum.acquired\
+                if participation_review["review"]==models.ReviewEnum.accepted\
+                else models.ParticipationStatusEnum.rejected 
         updated_participation = session\
             .execute(sql.update(models.Participation)\
                 .where(models.Participation.id == participation_review["participation_id"])\

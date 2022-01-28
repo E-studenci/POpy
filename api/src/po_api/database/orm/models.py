@@ -29,32 +29,32 @@ def tablename_to_class_name(string:str):
 # declarative base class
 Base = declarative_base()
 class ColorsEnum(str, enum.Enum):
-    red = "red".capitalize()
-    green = "green".capitalize()
-    blue = "blue".capitalize()
-    black = "black".capitalize()
-    yellow = "yellow".capitalize()
+    red = "red"
+    green = "green"
+    blue = "blue"
+    black = "black"
+    yellow = "yellow"
 class PathStatus(str, enum.Enum):
-    open = "open".capitalize()
-    closed = "closed".capitalize()
+    open = "open"
+    closed = "closed"
 class TripDifficulty(str, enum.Enum):
-    easy = "easy".capitalize()
-    semi_easy = "semi_easy".capitalize()
-    medium = "medium".capitalize()
-    semi_hard = "semihard".capitalize()
-    hard = "hard".capitalize()
+    easy = "easy"
+    semi_easy = "semi_easy"
+    medium = "medium"
+    semi_hard = "semihard"
+    hard = "hard"
 class ReviewEnum(str, enum.Enum):
-    accepted = "accepted".capitalize()
-    rejected = "rejected".capitalize()    
+    accepted = "accepted"
+    rejected = "rejected"    
 class BadgeAcquirementStatusEnum(str, enum.Enum):
-    collecting_points = "collecting_points".capitalize()
-    waiting_for_review = "waiting_for_review".capitalize()
-    acquired = "acquired".capitalize()
-    rejected = "rejected".capitalize()
+    collecting_points = "collecting_points"
+    waiting_for_review = "waiting_for_review"
+    acquired = "acquired"
+    rejected = "rejected"
 class ParticipationStatusEnum(str, enum.Enum):
-    waiting_for_review = "waiting_for_review".capitalize()
-    acquired = "acquired".capitalize()
-    rejected = "rejected".capitalize()
+    waiting_for_review = "waiting_for_review"
+    acquired = "accepted"
+    rejected = "rejected"
 
 trip_guides = db.Table('association', Base.metadata,
     db.Column('guide', db.ForeignKey(TABLE_USERS + '.id'), primary_key=True),

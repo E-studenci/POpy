@@ -12,7 +12,7 @@ import po_api.database.orm.models as models
 
 USER_PATH="/user"
 
-@APP.route(f'{USER_PATH}', methods=['PUT'])
+@APP.route(f'{USER_PATH}', methods=['POST'])
 @login_required
 @response_wrapper(schemas.CREATE_USER_SCHEMA)
 def create_user():
