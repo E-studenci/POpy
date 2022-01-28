@@ -56,11 +56,11 @@ def review_badge_acquirement():
         code=200
     )
 
-@APP.route(f'{REVIEW_PATH}/review_badge_acquirement', methods=['GET'])
+@APP.route(f'{REVIEW_PATH}/pending_badge_acquirements/<id>', methods=['GET'])
 @login_required
 @response_wrapper()
-def review_badge_acquirement():
-    result = read.get_badge_acquirement_by_id()
+def get_badge_acquirement_by_id(id: int):
+    result = read.get_badge_acquirement_by_id(id)
     if result:
         return ResponseData(
         code=200,
