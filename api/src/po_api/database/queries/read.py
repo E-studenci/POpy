@@ -30,7 +30,16 @@ def get_path_by_id(session: Session, id: int):
     return session\
         .execute(
             sql.select(models.Path)\
-            .where(models.Path.id == id)
+            .where(models.Path.id == id)\
+            .options(
+                joinedload(models.Path.waypoint_a)\
+                    .options(
+                        joinedload(models.Waypoint.mountain_range),
+                    ),
+                joinedload(models.Path.waypoint_b)\
+                    .options(
+                        joinedload(models.Waypoint.mountain_range),
+                    ))
         ).first()
 
 @DATABASE.db_query(True)
