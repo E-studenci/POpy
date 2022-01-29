@@ -48,6 +48,8 @@ CREATE_USER_SCHEMA = {
                 "maxLength": 30},
         "surname": {"type" : "string",
                     "maxLength": 30}, 
+        "email": {"type" : "string",
+                "maxLength": 30},
         "args": {"type": "object",
             "properties": {
                 "is_handicapped": { "type": "boolean" },
@@ -58,7 +60,7 @@ CREATE_USER_SCHEMA = {
                 "przodownik_licence_nr": { "type": "string" },
         }}
     },
-    "required": ["login", "password", "name", "surname", "args"]
+    "required": ["login", "password", "name", "surname", "email", "args"]
 }
 
 CREATE_TRIP_PLAN_SCHEMA = {

@@ -64,10 +64,9 @@ trip_guides = db.Table('association', Base.metadata,
 @dataclass
 class User(Base):
     id:int
-    login: str
-    password: str
     name: str
     surname: str
+    email: str
 
     roles: list['UserRole']
     badge_acquirement_reviews: list['BadgeAcquirementReview']
@@ -83,6 +82,7 @@ class User(Base):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     login = db.Column(db.String(30), unique=True)
     password = db.Column(db.String(255))
+    email = db.Column(db.String(30), unique=True)
     name = db.Column(db.String(30))
     surname = db.Column(db.String(30))
     
