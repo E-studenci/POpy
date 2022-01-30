@@ -128,7 +128,7 @@ def get_badge_acquirement_by_id(session: Session, id: int):
                             .options(joinedload(models.User.roles))
                     ),
                     joinedload(models.BadgeAcquirement.participations)\
-                        .where(models.BadgeAcquirement.status == models.BadgeAcquirementStatusEnum.acquired)\
+                        # .where(models.BadgeAcquirement.status == models.BadgeAcquirementStatusEnum.acquired)\
                             .options(joinedload(models.Participation.participation_reviews)\
                                 .options(joinedload(models.ParticipationReview.reviewer))
                             )
