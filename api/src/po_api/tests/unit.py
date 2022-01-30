@@ -200,3 +200,17 @@ class TestGetWaypointByName(unittest.TestCase):
 #             "waypoint_b_id":9999,
 #             "distance":123})
 #         print()
+
+# class TestCreateUserRole(unittest.TestCase):
+#     def test_good_data(self):
+#         result = create.assign_role(1,1,{"is_handicapped": False, "birth_date": datetime.datetime.now()})
+#         result = create.assign_role(2,1,{"is_handicapped": False, "birth_date": datetime.datetime.now()})
+#         result = create.assign_role(3,2,{"licence_nr": 123434343123434})
+#         result = create.assign_role(4,4,{"licence_nr": 211234433434434})
+#         result = create.assign_role(5,1,{"is_handicapped": True, "birth_date": datetime.datetime.now()})
+#         result = create.assign_role(6,1,{"is_handicapped": True, "birth_date": datetime.datetime.now()})
+#         result = create.assign_role(7,2,{"licence_nr": 123443124341234})
+#         result = create.assign_role(8,1,{"is_handicapped": False, "birth_date": datetime.datetime.now()})
+#         result = create.assign_role(9,4,{"licence_nr": 321412346489943})
+#         result = create.assign_role(10,1,{"is_handicapped": False, "birth_date": datetime.datetime.now()})
+#         print()

@@ -50,17 +50,17 @@ CREATE_USER_SCHEMA = {
                     "maxLength": 30}, 
         "email": {"type" : "string",
                 "maxLength": 30},
+        "role": {"type" : "string"},
         "args": {"type": "object",
             "properties": {
                 "is_handicapped": { "type": "boolean" },
                 "birth_date": { 
                     "type": "string",
                     "format": "date" },
-                "przewodnik_licence_nr": { "type": "string" },
-                "przodownik_licence_nr": { "type": "string" },
+                "licence_nr": { "type": "string" },
         }}
     },
-    "required": ["login", "password", "name", "surname", "email", "args"]
+    "required": ["login", "password", "name", "surname", "email", "role", "args"]
 }
 
 CREATE_TRIP_PLAN_SCHEMA = {

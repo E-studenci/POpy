@@ -40,15 +40,17 @@ def get_path(path_id: int):
 @login_required
 @response_wrapper()
 def get_paths_from_waypoint(waypoint_id: int):
-    result = read.get_all_paths(False, waypoint_id)
-    if result:
+    wp = read.get_waypoint_by_id(waypoint_id)
+    if not wp:
         return ResponseData(
-        code=200,
-        data=jsonify(data=result).json["data"]
-        )
-    return ResponseData(
         code=400,
         error = ResponseError(name="Invalid Data", description="waypoint not found") )
+    result = read.get_all_paths(False, waypoint_id)
+    return ResponseData(
+    code=200,
+    data=jsonify(data=result).json["data"]
+    )
+    
 
 
 @APP.route(f'{PATH_PATH}', methods=['POST'])

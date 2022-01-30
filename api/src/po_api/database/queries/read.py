@@ -142,6 +142,12 @@ def auth_user(session: Session, login: str, password:str):
         .where(sql.and_(models.User.login == login, models.User.password == password)))
     return result.first()
 
+@DATABASE.db_query(True)
+def get_role(session: Session, role: str):
+    result = session.execute(sql.select(models.Role)\
+        .where(models.Role.name == role))
+    return result.first()
+
 @DATABASE.db_query()
 def get_all_mountain_ranges(session: Session):
     result = session\
@@ -149,3 +155,11 @@ def get_all_mountain_ranges(session: Session):
             sql.select(models.MountainRange).options(joinedload(models.MountainRange.waypoints))
         ).unique().scalars().all()
     return result
+
+@DATABASE.db_query(True)
+def get_waypoint_by_id(session: Session, id: int):
+    return session\
+        .execute(
+            sql.select(models.Waypoint)\
+            .where(models.Waypoint.id == id)
+        ).first()
