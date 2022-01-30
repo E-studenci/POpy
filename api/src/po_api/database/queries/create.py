@@ -77,7 +77,7 @@ def review_badge_acquirement(session: Session, badge_acquirement_review: dict):
 @DATABASE.db_query()
 def review_participation(session: Session, participation_review:dict):
     session.begin()
-    try:
+    try: # TODO automatic waiting for review
         inserted_review = session\
             .execute(sql.insert(models.ParticipationReview)\
                 .values(

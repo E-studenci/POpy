@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session, selectinload, joinedload, noload
+from sqlalchemy.orm import Session, selectinload, joinedload, noload, with_loader_criteria
 from po_api import DATABASE
 import po_api.database.orm.models as models
 import sqlalchemy as sql
@@ -110,7 +110,8 @@ def get_pending_badge_acquirements(session: Session):
                     joinedload(models.BadgeAcquirement.participations)\
                         .options(joinedload(models.Participation.participation_reviews)\
                             .options(joinedload(models.ParticipationReview.reviewer))
-                        )
+                        ),
+                    with_loader_criteria(models.Participation, models.Participation.status == models.ParticipationStatusEnum.acquired)
             )
     )
     return result.unique().scalars().all()
@@ -128,10 +129,10 @@ def get_badge_acquirement_by_id(session: Session, id: int):
                             .options(joinedload(models.User.roles))
                     ),
                     joinedload(models.BadgeAcquirement.participations)\
-                        # .where(models.BadgeAcquirement.status == models.BadgeAcquirementStatusEnum.acquired)\
-                            .options(joinedload(models.Participation.participation_reviews)\
-                                .options(joinedload(models.ParticipationReview.reviewer))
-                            )
+                        .options(joinedload(models.Participation.participation_reviews)\
+                            .options(joinedload(models.ParticipationReview.reviewer))
+                        ),
+                with_loader_criteria(models.Participation, models.Participation.status == models.ParticipationStatusEnum.acquired)
             )
     )
     return result.first()
