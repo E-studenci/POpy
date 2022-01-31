@@ -20,3 +20,6 @@ LOGIN_MANAGER.init_app(APP)
 BASIC_AUTH = HTTPBasicAuth()
 
 import po_api.initialize_modules
+
+def run_app(host: str = '127.0.0.1', port: int = 5000):
+    APP.run(host=host, port=port, use_reloader=False, debug=True)
