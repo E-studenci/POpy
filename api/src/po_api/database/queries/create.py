@@ -4,13 +4,29 @@ from po_api import DATABASE
 import po_api.database.orm.models as models
 import sqlalchemy as sql
 from po_api.database.db import Database
-
-
+ 
 @DATABASE.db_query()
-def create_user(session:Session, user: dict):
+def assign_role(session:Session, user_id: int, role_id: int, args: dict):
     session.begin()
     try:
-        args = user.pop("args")
+        inserted_role = session\
+            .execute(sql.insert(models.UserRole)\
+                .values(
+                    user_id=user_id,
+                    role_id=role_id,
+                    args=args
+                ))
+    except:
+        session.rollback()
+        raise
+    else:
+        session.commit()
+    return inserted_role
+
+@DATABASE.db_query()
+def create_user(session:Session, user: dict, role_id: int, args=dict):
+    session.begin()
+    try:
         inserted_user = session\
             .execute(sql.insert(models.User)\
                 .values(
@@ -21,9 +37,7 @@ def create_user(session:Session, user: dict):
             .execute(sql.insert(models.UserRole)\
                 .values(
                     user_id=inserted_user.inserted_primary_key[0],
-                    role_id=sql\
-                        .select(models.Role.id)\
-                            .where(models.Role.name == "Tourist").scalar_subquery(),
+                    role_id=role_id,
                     args=args
                 ))
     except:
@@ -63,7 +77,7 @@ def review_badge_acquirement(session: Session, badge_acquirement_review: dict):
 @DATABASE.db_query()
 def review_participation(session: Session, participation_review:dict):
     session.begin()
-    try:
+    try: # TODO automatic waiting for review
         inserted_review = session\
             .execute(sql.insert(models.ParticipationReview)\
                 .values(

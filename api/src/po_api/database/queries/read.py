@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session, selectinload, joinedload, noload
+from sqlalchemy.orm import Session, selectinload, joinedload, noload, with_loader_criteria
 from po_api import DATABASE
 import po_api.database.orm.models as models
 import sqlalchemy as sql
@@ -30,7 +30,16 @@ def get_path_by_id(session: Session, id: int):
     return session\
         .execute(
             sql.select(models.Path)\
-            .where(models.Path.id == id)
+            .where(models.Path.id == id)\
+            .options(
+                joinedload(models.Path.waypoint_a)\
+                    .options(
+                        joinedload(models.Waypoint.mountain_range),
+                    ),
+                joinedload(models.Path.waypoint_b)\
+                    .options(
+                        joinedload(models.Waypoint.mountain_range),
+                    ))
         ).first()
 
 @DATABASE.db_query(True)
@@ -101,15 +110,44 @@ def get_pending_badge_acquirements(session: Session):
                     joinedload(models.BadgeAcquirement.participations)\
                         .options(joinedload(models.Participation.participation_reviews)\
                             .options(joinedload(models.ParticipationReview.reviewer))
-                        )
+                        ),
+                    with_loader_criteria(models.Participation, models.Participation.status == models.ParticipationStatusEnum.acquired)
             )
     )
     return result.unique().scalars().all()
+
+
+@DATABASE.db_query(True)
+def get_badge_acquirement_by_id(session: Session, id: int):
+    result = session.execute(sql.select(models.BadgeAcquirement)\
+        .where(models.BadgeAcquirement.id == id)\
+            .options(
+                joinedload(models.BadgeAcquirement.badge),
+                joinedload(models.BadgeAcquirement.got_book)\
+                    .options(
+                        joinedload(models.GotBook.owner)\
+                            .options(joinedload(models.User.roles))
+                    ),
+                    joinedload(models.BadgeAcquirement.participations)\
+                        .options(joinedload(models.Participation.participation_reviews)\
+                            .options(joinedload(models.ParticipationReview.reviewer))
+                        ),
+                with_loader_criteria(models.Participation, models.Participation.status == models.ParticipationStatusEnum.acquired)
+            )
+    )
+    return result.first()
+
 
 @DATABASE.db_query(True)
 def auth_user(session: Session, login: str, password:str):
     result = session.execute(sql.select(models.User)\
         .where(sql.and_(models.User.login == login, models.User.password == password)))
+    return result.first()
+
+@DATABASE.db_query(True)
+def get_role(session: Session, role: str):
+    result = session.execute(sql.select(models.Role)\
+        .where(models.Role.name == role))
     return result.first()
 
 @DATABASE.db_query()
@@ -119,3 +157,11 @@ def get_all_mountain_ranges(session: Session):
             sql.select(models.MountainRange).options(joinedload(models.MountainRange.waypoints))
         ).unique().scalars().all()
     return result
+
+@DATABASE.db_query(True)
+def get_waypoint_by_id(session: Session, id: int):
+    return session\
+        .execute(
+            sql.select(models.Waypoint)\
+            .where(models.Waypoint.id == id)
+        ).first()

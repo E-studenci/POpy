@@ -53,7 +53,7 @@ class BadgeAcquirementStatusEnum(str, enum.Enum):
     rejected = "rejected"
 class ParticipationStatusEnum(str, enum.Enum):
     waiting_for_review = "waiting_for_review"
-    acquired = "accepted"
+    acquired = "acquired"
     rejected = "rejected"
 
 trip_guides = db.Table('association', Base.metadata,
@@ -64,10 +64,9 @@ trip_guides = db.Table('association', Base.metadata,
 @dataclass
 class User(Base):
     id:int
-    login: str
-    password: str
     name: str
     surname: str
+    email: str
 
     roles: list['UserRole']
     badge_acquirement_reviews: list['BadgeAcquirementReview']
@@ -83,6 +82,7 @@ class User(Base):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     login = db.Column(db.String(30), unique=True)
     password = db.Column(db.String(255))
+    email = db.Column(db.String(30), unique=True)
     name = db.Column(db.String(30))
     surname = db.Column(db.String(30))
     
@@ -174,7 +174,7 @@ class Waypoint(Base):
     __tablename__ = TABLE_WAYPOINTS
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(30))
+    name = db.Column(db.String(60)) #TODO
     elevation = db.Column(db.Integer)
     longtitude = db.Column(db.String(40))
     latitude = db.Column(db.String(40))
@@ -348,6 +348,7 @@ class Participation(Base):
 class GotBook(Base):
     id: int
     issue_date: datetime
+    book_nr: str
     badge_acquirements: list['BadgeAcquirement']
     owner: 'User'
 
@@ -355,6 +356,7 @@ class GotBook(Base):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     issue_date = db.Column(db.DateTime)
+    book_nr = db.Column(db.String(50), unique=True)
 
     badge_acquirements = relationship(tablename_to_class_name(TABLE_BADGE_ACQUIREMENTS), lazy='noload', back_populates="got_book")
 
@@ -416,7 +418,7 @@ class Trip(Base):
     trip_plan = relationship(tablename_to_class_name(TABLE_TRIP_PLANS), lazy='noload', back_populates="trips")
 
 if __name__ == "__main__":
-    url = f'postgresql+psycopg2://postgres:AB9B75D8E128E8040A0E0D751D37393CA8D4C663@130.61.111.97:30001/test'
+    url = f'postgresql+psycopg2://postgres:AB9B75D8E128E8040A0E0D751D37393CA8D4C663@130.61.111.97:30001/postgres'
     engine = db.create_engine(url, echo=True)
     # Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)

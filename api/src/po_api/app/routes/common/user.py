@@ -13,13 +13,24 @@ import po_api.database.orm.models as models
 USER_PATH="/user"
 
 @APP.route(f'{USER_PATH}', methods=['POST'])
-@login_required
 @response_wrapper(schemas.CREATE_USER_SCHEMA)
 def create_user():
     json_data = request.json
-    result = create.create_user(json_data)
+    role = read.get_role(json_data.pop("role"))
+    if not role:
+        return ResponseData(
+            code = 400,
+            error = ResponseError(name="Invalid Data", description="role not found")
+        )
+    args = json_data.pop("args")
+    result = create.create_user(json_data, role.id, args)
     if isinstance(result, str):
-         return ResponseData(
+        if result.__contains__("already exists"):
+            if result.__contains__("Key (login)"):
+                result = "Podany login jest juz wykorzystany"
+            if result.__contains__("Key (email)"):
+                result = "Podany email jest juz wykorzystany"
+        return ResponseData(
             code = 400,
             error = ResponseError(name="Invalid Data", description=result)
         )
