@@ -1,21 +1,20 @@
 import unittest
-import click
+import time
 
 import po_api.tests.e2e as e2e
 import po_api.tests.unit as unit
+import threading
+import po_api
 
-@click.group()
-def cli():
-    pass
+thread = threading.Thread(target=po_api.run_app, daemon=True)
+thread.start()
+
+time.sleep(3)
+print()
+
+suite1 = unittest.TestLoader().loadTestsFromModule(e2e)
+unittest.TextTestRunner(verbosity=2).run(suite1)
 
 
-@cli.command()
-def e2e_tests():
-    suite = unittest.TestLoader().loadTestsFromModule(e2e)
-    unittest.TextTestRunner(verbosity=2).run(suite)
-
-
-@cli.command()
-def unit_tests():
-    suite = unittest.TestLoader().loadTestsFromModule(unit)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+suite2 = unittest.TestLoader().loadTestsFromModule(unit)
+unittest.TextTestRunner(verbosity=2).run(suite2)
