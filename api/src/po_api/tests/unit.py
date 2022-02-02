@@ -40,7 +40,10 @@ class TestJsonParser(unittest.TestCase):
 class TestJsonSchemas(unittest.TestCase):
     @classmethod
     def create_all_tests(cls):
-        all_schemas = [(item, json_schemas.__dict__[item]) for item in json_schemas.__dict__ if 'SCHEMA' in item]
+        all_schemas = [
+            (item, json_schemas.__dict__[item]) 
+            for item in json_schemas.__dict__ if 'SCHEMA' in item
+        ]
         for key, schema in all_schemas:
             def test_method(self):
                 valid = True
