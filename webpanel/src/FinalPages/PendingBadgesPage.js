@@ -1,71 +1,95 @@
+import { useEffect } from "react";
 import { useState } from "react";
+import {Link} from 'react-router-dom';
 
 const PendingBadgesPage = () => {
 
-    const data = [
-          {
-            "badge": {
-              "acquirements": [],
-              "id": 1,
-              "name": "mala",
-              "required_age": 8,
-              "required_points": 122
-            },
-            "got_book": {
-              "badge_acquirements": [],
-              "id": 1,
-              "issue_date": "Sat, 01 Jan 2022 00:00:00 GMT",
-              "owner": {
-                "badge_acquirement_reviews": [],
-                "got_book": null,
-                "guided_trips": [],
-                "id": 3,
-                "login": "es",
-                "name": "Jack",
-                "organized_trips": [],
-                "participation_reviews": [],
-                "password": "ess",
-                "roles": [],
-                "surname": "Sparrow",
-                "trip_plans": []
-              }
-            },
-            "id": 1,
-            "participations": [
-              {
-                "badge_acquirement": null,
-                "id": 1,
-                "participation_reviews": [
-                  {
-                    "earned_points": 12,
-                    "id": 3,
-                    "participation": null,
-                    "review": "Accepted",
-                    "review_date": "Mon, 24 Jan 2022 10:51:34 GMT",
-                    "reviewer": {
-                      "badge_acquirement_reviews": [],
-                      "got_book": null,
-                      "guided_trips": [],
-                      "id": 3,
-                      "login": "es",
-                      "name": "Jack",
-                      "organized_trips": [],
-                      "participation_reviews": [],
-                      "password": "ess",
-                      "roles": [],
-                      "surname": "Sparrow",
-                      "trip_plans": []
-                    }
-                  }
-                ],
-                "status": "Acquired",
-                "trip": null
-              }
-            ],
-            "reviews": [],
-            "status": "Waiting_for_review"
-          }
-        ]
+    const [data, setData] = useState([
+        //   {
+        //     "badge": {
+        //       "acquirements": [],
+        //       "id": 1,
+        //       "name": "mala",
+        //       "required_age": 8,
+        //       "required_points": 122
+        //     },
+        //     "got_book": {
+        //       "badge_acquirements": [],
+        //       "id": 1,
+        //       "issue_date": "Sat, 01 Jan 2022 00:00:00 GMT",
+        //       "owner": {
+        //         "badge_acquirement_reviews": [],
+        //         "got_book": null,
+        //         "guided_trips": [],
+        //         "id": 3,
+        //         "login": "es",
+        //         "name": "Jack",
+        //         "organized_trips": [],
+        //         "participation_reviews": [],
+        //         "password": "ess",
+        //         "roles": [],
+        //         "surname": "Sparrow",
+        //         "trip_plans": []
+        //       }
+        //     },
+        //     "id": 1,
+        //     "participations": [
+        //       {
+        //         "badge_acquirement": null,
+        //         "id": 1,
+        //         "participation_reviews": [
+        //           {
+        //             "earned_points": 12,
+        //             "id": 3,
+        //             "participation": null,
+        //             "review": "Accepted",
+        //             "review_date": "Mon, 24 Jan 2022 10:51:34 GMT",
+        //             "reviewer": {
+        //               "badge_acquirement_reviews": [],
+        //               "got_book": null,
+        //               "guided_trips": [],
+        //               "id": 3,
+        //               "login": "es",
+        //               "name": "Jack",
+        //               "organized_trips": [],
+        //               "participation_reviews": [],
+        //               "password": "ess",
+        //               "roles": [],
+        //               "surname": "Sparrow",
+        //               "trip_plans": []
+        //             }
+        //           }
+        //         ],
+        //         "status": "Acquired",
+        //         "trip": null
+        //       }
+        //     ],
+        //     "reviews": [],
+        //     "status": "Waiting_for_review"
+        //   }
+        ])
+
+        async function fetchData(){
+            var requestOptions = {
+                method: 'GET',
+                redirect: 'follow',
+                credentials: 'include',
+                };
+
+                let tmp = {}
+        
+             await fetch("http://localhost:5000/review/pending_badge_acquirements", requestOptions) //tutaj do zmiany 
+                .then(response => response.text())
+                .then(result => tmp = JSON.parse(result)) //ustawić ten syf
+                .catch(error => console.log('error', error));
+                
+            setData(tmp.data)
+          
+        }
+
+        useEffect(() => {
+            fetchData()
+        }, [])
 
         const [input, setInput] = useState("");
 
@@ -95,7 +119,7 @@ const PendingBadgesPage = () => {
             {
                 input === "" ? 
                 data.map((v) => (
-                    <a href="#dew">
+                    <Link to={`/badge/${v.id}`}>
                     <div class="w-full border border-black rounded-full flex flex-row mt-1 pt-2 pb-2">
                         <div class="w-1/4 flex justify-start pl-5">
                             <p>{v.got_book.owner.name}</p>
@@ -104,17 +128,17 @@ const PendingBadgesPage = () => {
                             <p>{v.got_book.owner.surname}</p>
                         </div>
                         <div class="w-1/4 flex justify-start pl-5">
-                            <p>{v.badge.name}</p>
+                            <p>{v.badge.name.split(":")[0]}</p>
                         </div>
                         <div class="w-1/4 flex justify-start pl-5">
-                            <p>Srebrna</p>
+                            <p>{v.badge.name.split(":")[1]}</p>
                         </div>
                     </div>
-                    </a>
+                    </Link>
                 ))
                 :
                 data.filter((v) => input.toLowerCase == v.got_book.owner.surname.substring(0, input.length).toLowerCase).map((v) => (
-                    <a href="#dew">
+                    <Link to={`/badge/${v.id}`}>
                     <div class="w-full border border-black rounded-full flex flex-row mt-1 pt-2 pb-2">
                         <div class="w-1/4 flex justify-start pl-5">
                             <p>{v.got_book.owner.name}</p>
@@ -129,7 +153,7 @@ const PendingBadgesPage = () => {
                             <p>Srebrna</p>
                         </div>
                     </div>
-                    </a>
+                    </Link>
                 ))
             }
 

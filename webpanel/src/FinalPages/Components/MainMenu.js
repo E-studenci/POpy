@@ -9,7 +9,7 @@ const MainMenu = () => {
                 <Link to="/create_trip" class="text-black hover:text-white bg-transparent hover:bg-gray-400 rounded-full m-2 py-3 text-xl border border-black">Stwórz plan wycieczki</Link>
                 <Link to="/routes" class="text-black hover:text-white bg-transparent hover:bg-gray-400 rounded-full m-2 py-3 text-xl border border-black">Lista odcinków</Link>
                 <Link to="/pending_badges" class="text-black hover:text-white bg-transparent hover:bg-gray-400 rounded-full m-2 py-3 text-xl  border border-black">Weryfikacja podań o odznakę</Link>
-                <Link to="/log_in" class="text-black hover:text-white bg-transparent hover:bg-gray-400 rounded-full m-2 py-3 text-xl border border-black">Zaloguj</Link>
+                
             </div>
         </div>
      );

@@ -21,8 +21,8 @@ import TitleButton from './FinalPages/Components/TitleButton';
 function App() {
   return (
     <div className="App">
-      <Navbar button1="Zaloguj" button2="Stwórz konto"/>
       <Router>
+      <Navbar/>
       <Routes>
           <Route path="/" element={<TitleButton />}></Route>
           <Route path="/menu" element={<MainMenu />} />
@@ -32,7 +32,10 @@ function App() {
           <Route path="/routes" element={<PointsList />}></Route>
           <Route path="/route_details/*" element={<RoutePage />}/>
           <Route path="/pending_badges" element={<PendingBadgesPage />}/>
+          <Route path="/badge/*" element={<BadgeDetailsPage />}/>
           <Route path="/log_in" element={<LogInPanel />}/>
+          <Route path="/add_route" element={<AddPathPage />}/>
+          <Route path="/sign_in" element={<SingInPanel />}/>
         
       </Routes>
       </Router>

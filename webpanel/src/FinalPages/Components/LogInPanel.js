@@ -1,11 +1,15 @@
 import {useState} from "react";
+import { useNavigate } from "react-router";
 
 const LogInPanel = () => {
 
     const [login, setLogin] = useState("");
     const [pass, setPass] = useState("");
+    const [bad, setBad] = useState(false);
+    var response = {}
+    let navigate = useNavigate();
 
-    function log(){  // es, ess
+    async function log(){  // es, ess
         var myHeaders = new Headers();
         myHeaders.append('Authorization', 'Basic ' + btoa(login + ":" + pass));
         var requestOptions = {
@@ -15,25 +19,22 @@ const LogInPanel = () => {
             credentials: 'include',
             };
     
-            fetch("http://localhost:5000/login", requestOptions)
+        await fetch("http://localhost:5000/login", requestOptions)
             .then(response => response.text())
-            .then(result => console.log(result))
+            .then(result => response = JSON.parse(result))
             .catch(error => console.log('error', error));
 
-            requestOptions = {
-                method: 'GET',
-                redirect: 'follow',
-                credentials: 'include',
-                };
+        if (response.status !== "success"){
+            setLogin("")
+            setPass("")
+            setBad(true)
+        }
+        else{
+            console.log("logged");
+            navigate("/menu");
+        }
 
-            console.log('Kliknij zaloguj jeszcze raz!');    
-
-            fetch("http://localhost:5000/path", requestOptions)
-            .then(response => response.text())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
-
-
+        
 
 
     }
@@ -58,7 +59,7 @@ const LogInPanel = () => {
             <div class="flex flex-row mt-10">
                 <div class="w-1/3 "></div>
                 <div class="bg-red-500 w-1/3 rounded-full justify-center">
-                <p class="center text-white size-xl">Nieprawidłowe dane logowania!</p>
+                { bad ? <p class="center text-white size-xl">Nieprawidłowe dane logowania!</p> : null}
                 </div>
                 
             </div>

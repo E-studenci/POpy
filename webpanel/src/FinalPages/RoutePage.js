@@ -1,49 +1,108 @@
-import { useLocation } from "react-router";
+import { useEffect } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { Navigate, useLocation, Link } from "react-router-dom";
 
 const RoutePage = () => {
 
+    const [deletePanel, setDeletePanel] = useState(false);
     const location = useLocation()
     const id = location.pathname.split("/")[2]
-    const data = {
-        "color": "3",
-        "distance": 32,
-        "id": 1,
+    let navigate = useNavigate()
+    const [data, setData] = useState({
+        "color": "",
+        "distance": 0,
+        "id": 0,
         "is_official": true,
-        "points": 2,
+        "points": 0,
         "segments": [],
-        "status": "1",
+        "status": "",
         "waypoint_a": {
-          "description": "asdf",
-          "elevation": 123,
-          "id": 1,
-          "latitude": "123",
-          "longtitude": "321",
+          "description": "",
+          "elevation": 0,
+          "id": 0,
+          "latitude": "",
+          "longtitude": "",
           "mountain_range": {
             "id": 1,
             "name": "tatry",
             "waypoints": []
           },
-          "name": "pkt_1",
+          "name": "",
           "path_starts": []
         },
         "waypoint_b": {
-          "description": "asdasd",
-          "elevation": 321,
-          "id": 2,
-          "latitude": "321",
-          "longtitude": "123",
+          "description": "",
+          "elevation": 0,
+          "id": 0,
+          "latitude": "",
+          "longtitude": "",
           "mountain_range": {
             "id": 1,
             "name": "tatry",
             "waypoints": []
           },
-          "name": "pkt_2",
+          "name": "",
           "path_starts": []
         }
+      })
+
+      async function fetchData(){
+              //get punkt po id
+        let tmp = {}
+
+        var requestOptions = {
+            method: 'GET',
+            redirect: 'follow',
+            credentials: 'include',
+            };
+    
+            await fetch("http://localhost:5000/path/"+id, requestOptions) //tutaj do zmiany 
+            .then(response => response.text())
+            .then(result => tmp = JSON.parse(result)) //zrobić coś z resultem 
+            .catch(error => console.log('error', error));
+
+            console.log(tmp.data)
+            setData(tmp.data)
+      }
+
+      useEffect(() => {
+            fetchData();
+      }, [])
+
+    async  function deleteRoute(){
+          //delete ten punkt
+        var requestOptions = {
+            method: 'DELETE',
+            redirect: 'follow',
+            credentials: 'include', // ??????
+            };
+    
+            await fetch("http://localhost:5000/path/"+id, requestOptions) //tutaj do zmiany 
+            .then(response => response.text())
+            .then(result => console.log(result)) //zrobić coś z resultem 
+            .catch(error => console.log('error', error));
+
+        navigate("/routes");
+
       }
 
     return ( 
         <div>
+            {deletePanel ? 
+            <div class="absolute w-full top-1/3">
+            <div class="flex justify-center items-center ">
+            <div class="w-1/2 border border-black flex flex-col bg-white">
+                <p>Czy na pewno chcesz usunąć ten odcinek? Po tym nie ma już odwrotu</p>
+                <div class = "mt-10 ml-5 mr-5">
+                <button class=" bg-green-500 border rounded-2xl py-2 w-1/2 mb-5 text-white" onClick={() => setDeletePanel(false)}>Powrót</button>
+                <button class=" bg-red-500 border rounded-2xl py-2 w-1/2 text-white" onClick={deleteRoute}>Usuń odcinek</button>
+                </div>
+                
+
+            </div>
+        </div></div> : null}
+
             <div class="w-full flex flex-row mt-10">
                 <div class="w-1/3 border border-black flex flex-col ml-10 h-min">
                     <p class="mt-2 text-xl">Punkt od</p>
@@ -68,7 +127,7 @@ const RoutePage = () => {
                     <div class="border border-black mr-10 ml-20 rounded-xl">
                         <div class="flex flex-row">
                             <div class="w-1/2 items-start flex">
-                                <p class="ml-5">{`Kolor: ${data.color}`}</p>
+                                <p class="ml-5">Kolor: {data.color === "red" ? "Czerwony" :data.color === "blue" ? "Niebieski" : data.color === "green" ? "Zielony" : data.color === "yellow" ? "Żółty" : "Czarny"}</p>
                             </div>
                             <div class="w-1/2 flex items-start">
                                 <p class="ml-5">Kierunek: 2</p>
@@ -102,7 +161,7 @@ const RoutePage = () => {
                             </button>
                         </div>
                         <div class="w-1/2 flex justify-start">
-                            <button class="mt-2 ml-2 bg-red-500 border rounded-2xl py-1 px-24 w-2/3">
+                            <button class="mt-2 ml-2 bg-red-500 border rounded-2xl py-1 px-24 w-2/3" onClick={() => setDeletePanel(true)}>
                                 <p class="text-white">Usuń odcinek</p>
                             </button>
                         </div>

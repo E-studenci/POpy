@@ -1,45 +1,41 @@
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 
 const AddPointPage = () => {
 
+    const [dfetch, setdfetch] = useState(true)
+
     const [pointsArray, setPointsArray] = useState({
-        "results": [
-          {
-            "description": "dsa",
-            "elevation": 321,
-            "id": 2,
-            "latitude": "dsa",
-            "longtitude": "dsa",
-            "mountain_range": {
-              "id": 1,
-              "name": "tatry",
-              "waypoints": []
-            },
-            "name": "dsa",
-            "path_starts": []
-          },
-          {
-            "description": "asd",
-            "elevation": 123,
-            "id": 1,
-            "latitude": "asd",
-            "longtitude": "asd",
-            "mountain_range": {
-              "id": 1,
-              "name": "tatry2",
-              "waypoints": []
-            },
-            "name": "asssssssd",
-            "path_starts": []
-          }
+        "data": [
         ]
       });
-    const [mountainRangeArray, setMountainRangeArray] = useState(["tatry", "tatry2"]); // tutaj wszystkie możliwe wybory
-    const points = pointsArray.results
+
+    const [error, setError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
+
+    const [mountainRangeArray, setMountainRangeArray] = useState([{name: "Wszystkie punkty", id: 0}, {name: "tatry", id: 1}, {name: "tatry2", id: 2}]); // tutaj wszystkie możliwe wybory
+    //let points = pointsArray.data
+
+    const [points, setPoints] = useState([
+        {
+            "description": "asdf",
+            "elevation": 432,
+            "id": 5,
+            "latitude": "32",
+            "longtitude": "23",
+            "mountain_range": {
+                "id": 1,
+                "name": "tatry",
+                "waypoints": []
+            },
+            "name": "pkt_4fdrtrjd",
+            "path_starts": []
+        }])
+
     const [nState, setNState] = useState(true);
     const [eState, setEState] = useState(true);
-    const [currentRange, setCurrentRange] = useState("-1");
+    const [lol, setLol] = useState(-1)
+    const [currentRange, setCurrentRange] = useState(0)
 
     const [newName, setNewName] = useState("");
     const [newDescription, setNewDescription] = useState("");
@@ -62,9 +58,10 @@ const AddPointPage = () => {
         setEState(!eState);
     }
 
-    function changeMountainRange(n){
-        setCurrentRange(n);
+    async function changeMountainRange(n){
+        await setCurrentRange(n)
     }
+    
 
     function clearAll(){
         setNewName("");
@@ -78,17 +75,137 @@ const AddPointPage = () => {
         setNewLongtitude3("");
     }
 
-    function addPoint(){
+    async function addPoint(){
+
+
+        if(newName === "" || newElevation === "" || newLatitude1 === "" || newLatitude2 === "" || newLatitude3 === "" || newLongtitude1 === "" || 
+        newLatitude2 === "" || newLongtitude3 === "" || currentRange === 0){
+            setError(true)
+            setErrorMessage("Wprowadź wszystkie informacje o punkcie")
+            return
+        }
+
+        var myHeaders = new Headers();
+        myHeaders.append('Content-Type',"application/json");
+
+        var ctj1 = "S";
+        if(nState){
+            ctj1 = "N";
+        }
+        var ctj2 = "W";
+        if(eState){
+            ctj2 = "E";
+        }
+
+        var body = JSON.stringify({
+            name: newName,
+            elevation: parseInt(newElevation),
+            longtitude: newLongtitude1+":"+newLongtitude2+"'"+newLongtitude3+"''"+ctj1,
+            latitude: newLatitude1+":"+newLatitude2+"'"+newLatitude3+"''"+ctj2,
+            description: newDescription,
+            mountain_range_id: parseInt(currentRange)
+        })
+
+
         // tutaj wysłanie punktu
-        const tmp = latelyAdded;
-        latelyAdded.push(newName);
-        setLatelyAdded(tmp);
-        clearAll();
+        // ciało tego czegoś eloo
+        //ify czy coś trzeba czy nie 
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders, 
+            redirect: 'follow',
+            credentials: 'include',
+            body: body
+            };
+            let tmpr = {}
+            await fetch("http://localhost:5000/waypoint", requestOptions) //tutaj do zmiany 
+            .then(response => response.text())
+            .then(result => tmpr = JSON.parse(result)) //zrobić coś z resultem 
+            .catch(error => console.log('error', error));
+        
+        if(tmpr.status == "success"){
+            const tmp = latelyAdded;
+            latelyAdded.push(newName);
+            setLatelyAdded(tmp);
+            clearAll();
+            getPoints();
+        }
+        else{
+            setError(true)
+            setErrorMessage(tmpr.error.description)
+        }
+        
     }
+
+    async function getPoints(){
+        //wszystkie punkty 
+        let tmp = {}
+        var requestOptions = {
+            method: 'GET',
+            redirect: 'follow',
+            credentials: 'include',
+            };
+    
+            await fetch("http://localhost:5000/waypoint", requestOptions) //tutaj do zmiany 
+            .then(response => response.text())
+            .then(result => tmp = JSON.parse(result)) //ustawić ten syf
+            .catch(error => console.log('error', error));
+
+            //setPointsArray(tmp)
+            setPoints(tmp.data)
+    }
+
+    async function getMountainRanges(){
+
+    var requestOptions = {
+        method: 'GET',
+        redirect: 'follow',
+        credentials: 'include',
+        };
+
+    let tmp = {}
+    await fetch("http://localhost:5000/waypoint/mountain_ranges", requestOptions) //tutaj do zmiany 
+    .then(response => response.text())
+    .then(result => tmp = JSON.parse(result)) //ustawić ten syf
+    .catch(error => console.log('error', error));
+    
+    let tmp_data = []
+    tmp_data.push({name: "Wszystkie punkty", id:0})
+    tmp.data.forEach(element => {
+        console.log(element)
+        tmp_data.push({
+            name: element.name,
+            id:  parseInt(element.id)})
+    });
+
+    setMountainRangeArray(tmp_data)
+    console.log(mountainRangeArray)
+    }
+
+    useEffect(() => {
+        
+
+        getPoints()
+        getMountainRanges()
+    }, [])
 
 
     return ( 
         <div>
+            { 
+                error ? 
+                <div class="absolute w-full flex flex-row top-1/3">
+                    <div class="w-1/4">
+
+                    </div>
+                    <div class="bg-red-600 w-1/2">
+                        <p class="text-white mt-5 mb-3">{errorMessage}</p>
+                        <button class="mb-4 rounded-full bg-green-600 text-white px-10 text-xl" onClick={() => setError(false)}>Rozumiem</button>
+
+                    </div>
+                </div>
+                : null
+            }
             <div class="mt-2"><p class="text-xxl">Dodaj punkt</p></div>
             <div class="mt-5 flex flex-row  w-full">
                 <div class="w-1/12"></div>
@@ -107,10 +224,9 @@ const AddPointPage = () => {
                         </div>
                         <div class="w-1/2 grid justify-start">
                         <select class="w-96 border border-black" onChange={(e) => changeMountainRange(e.target.value)}>
-                            <option key="-1" value="-1"> </option>
                             {mountainRangeArray.map((v, i) => 
                             (
-                                <option key={i} value={i}>{v}</option>
+                                <option key={i} value={i}>{v.name}</option>
                             )
                             )}
                         </select>
@@ -192,17 +308,17 @@ const AddPointPage = () => {
 
                 </div>
                 <div class="w-1/6">
-                <p class="mt-2 text-xl font-semibold">{currentRange == "-1" ? "Wszystkie punkty" : mountainRangeArray[currentRange]}</p>
+                        <p class="mt-2 text-xl font-semibold">{mountainRangeArray[currentRange].name}</p>
                     <div class="grid justify-items-start">
                         {
-                            currentRange === "-1" ? 
+                            currentRange == 0 ? 
                             points.map((v) => (
-                                <p class="ml-10 mt-3">{v.name}</p>
+                                <p class="ml-10 mt-3">{v.name} - {v.elevation}m. n.p.m.</p>
                             )) :
-                            points.filter((v) => v.mountain_range.name === mountainRangeArray[currentRange]).map((v) => (
+                            points.filter((v) => v.mountain_range.name === mountainRangeArray[currentRange].name).map((v) => (
                                 newName === v.name ? 
-                                <p class="ml-10 mt-3 text-red-500">{v.name}</p> : 
-                                <p class="ml-10 mt-3">{v.name}</p>
+                                <p class="ml-10 mt-3 text-red-500">{v.name}  - {v.elevation}m. n.p.m.</p> : 
+                                <p class="ml-10 mt-3">{v.name}  - {v.elevation}m. n.p.m.</p>
                             ))
                         }
                     </div>

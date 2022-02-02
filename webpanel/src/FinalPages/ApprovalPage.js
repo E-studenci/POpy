@@ -1,20 +1,24 @@
 import { useEffect } from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { traverseTwoPhase } from "react-dom/cjs/react-dom-test-utils.production.min";
-import {Link} from 'react-router-dom';
+import {Link, Navigate} from 'react-router-dom';
+import { parse } from "postcss";
 
 const ApprovalPage = () => {
 
     const [details, setDetails] = useState(false);
 
-    const trip = 
+    let navigate = useNavigate()
+
+    const [trip, setTrip] = useState(
           {
             "date": "Sun, 23 Jan 2022 00:00:00 GMT",
             "description": "trip",
             "guides": [],
             "id": 1,
             "is_public": true,
-            "name": "trip1",
+            "name": "tripdasdasasd1",
             "organizer": null,
             "participations": [
               {
@@ -30,12 +34,12 @@ const ApprovalPage = () => {
                       "guided_trips": [],
                       "id": 3,
                       "login": "es",
-                      "name": "Jack",
+                      "name": "",
                       "organized_trips": [],
                       "participation_reviews": [],
                       "password": "ess",
                       "roles": [],
-                      "surname": "Sparrow",
+                      "surname": "",
                       "trip_plans": []
                     }
                   },
@@ -62,12 +66,12 @@ const ApprovalPage = () => {
                       "guided_trips": [],
                       "id": 6,
                       "login": "esss",
-                      "name": "Jack",
+                      "name": "",
                       "organized_trips": [],
                       "participation_reviews": [],
                       "password": "ess",
                       "roles": [],
-                      "surname": "Sparrow",
+                      "surname": "",
                       "trip_plans": []
                     }
                   },
@@ -160,7 +164,57 @@ const ApprovalPage = () => {
               ],
               "trips": []
             }
-          }
+          })
+
+        async function fetchData(){
+            //pobranie info o wycieczce
+            var requestOptions = {
+                method: 'GET',
+                redirect: 'follow',
+                credentials: 'include',
+                };
+                
+                let tmp = {}
+
+                await fetch("http://localhost:5000/trip/2", requestOptions) //tutaj do zmiany 
+                .then(response => response.text())
+                .then(result => tmp = JSON.parse(result)) //ustawić ten syf
+                .catch(error => console.log('error', error));
+
+
+            let tmp2 = [];
+            let tmp3 = 0;
+
+            for (var i in tmp.data.trip_plan.segments){
+                tmp3 = tmp3 + parseInt(tmp.data.trip_plan.segments[i].path.points)
+            }
+
+
+            for(var e in tmp.data.participations){
+
+                tmp2.push([tmp.data.participations[e].badge_acquirement.got_book.owner, tmp3, false, tmp.data.participations[e].id])
+            }
+
+            // trip.trip_plan.segments.map((v) => (
+            //     tmp += parseInt(v.path.points)
+            // ));
+
+            console.log(tmp)
+
+            
+
+
+            setParticipants(tmp2)
+            setTrip(tmp.data)
+            setPoints(tmp3)
+        }
+        
+
+        
+        useEffect(() => {
+            //pobranie info o wycieczce
+            fetchData()
+        }, [])
 
         //let points = 0;
 
@@ -176,9 +230,8 @@ const ApprovalPage = () => {
         const getParticipants = () => {
             let tmp = [];
             trip.participations.map((v) => (
-                tmp.push([v.badge_acquirement.got_book.owner, points])
+                tmp.push([v.badge_acquirement.got_book.owner, points, false])
             ));
-            console.log(tmp);
             return tmp;
         }
 
@@ -218,6 +271,37 @@ const ApprovalPage = () => {
         setNewPoints(0);
         setParticipants(tmp);
         showDetails();
+    }
+
+    async function accept(){
+        for (var i = 0; i < participants.length; i++){
+            var myHeaders = new Headers();
+            myHeaders.append('Content-Type',"application/json");
+            let review = "rejected"
+            if (participants[i][2]){
+                review = "accepted"
+            }
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            redirect: 'follow',
+            credentials: 'include',
+            body: JSON.stringify({
+                participation_id: participants[i][3],
+                earned_points: participants[i][1],
+                reviewer_id: 8,
+                review: review
+            })
+            };
+    
+            await fetch("http://localhost:5000/review/review_participation", requestOptions) //tutaj do zmiany 
+            .then(response => response.text())
+            .then(result => console.log(result)) //ustawić ten syf
+            .catch(error => console.log('error', error));
+        }
+
+        navigate("/menu")
+
     }
 
     return ( 
@@ -301,10 +385,10 @@ const ApprovalPage = () => {
                                 <p>{v.badge_acquirement.got_book.owner.name + " " + v.badge_acquirement.got_book.owner.surname}</p>
                             </div>
                             <div class="w-1/6 grid justify-center">
-                                <input type="checkbox" class="form-checkbox h-8 w-8"/>
+                                <input type="checkbox" class="form-checkbox h-8 w-8" onClick={(e) => participants[i][2] = !participants[i][2]}/>
                             </div>
                             <div class="w-3/12 grid justify-end mb-3">
-                                <button class="bg-red-500 w-full px-4" value={i} onClick={() => showDetails(i)}>{participants[i][1]}</button> 
+                                <button class=" w-full px-4" value={i} onClick={() => showDetails(i)}>{participants[i][1]}</button> 
                             </div>
                         </div>
                             
@@ -312,7 +396,7 @@ const ApprovalPage = () => {
                     }
 
                     <div class="mt-10 w-full grid justify-end">
-                        <Link to="/menu" class="bg-green-500 px-8 py-3 rounded-full text-white">Zatwierdź</Link>
+                        <button class="bg-green-500 px-8 py-3 rounded-full text-white" onClick={accept}>Zatwierdź</button>
                     </div>
 
                 </div>
