@@ -12,9 +12,8 @@ thread.start()
 time.sleep(3)
 print()
 
-suite1 = unittest.TestLoader().loadTestsFromModule(e2e)
+suite1 = unittest.TestLoader().loadTestsFromModule(unit)
 unittest.TextTestRunner(verbosity=2).run(suite1)
 
-
-suite2 = unittest.TestLoader().loadTestsFromModule(unit)
+suite2 = unittest.TestLoader().loadTestsFromModule(e2e)
 unittest.TextTestRunner(verbosity=2).run(suite2)
